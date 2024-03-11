@@ -3,12 +3,13 @@ package service
 import (
 	"intern-bcc/entity"
 	"intern-bcc/internal/repository"
+	"intern-bcc/model"
 )
 
 type MealServiceInterface interface {
 	FindAll() ([]entity.Meal, error)
 	FindByID(ID int) (entity.Meal, error)
-	Create(user entity.NewMeal) (entity.Meal, error)
+	Create(user model.NewMeal) (entity.Meal, error)
 }
 
 type MealService struct {
@@ -19,7 +20,7 @@ func NewMealService(repository repository.MealRepositoryInterface) MealServiceIn
 	return &MealService{repository}
 }
 
-func (m *MealService) Create(meal entity.NewMeal) (entity.Meal, error) {
+func (m *MealService) Create(meal model.NewMeal) (entity.Meal, error) {
 	nmeal := entity.Meal{
 		Name:        meal.Name,
 		Kalori:      meal.Kalori,

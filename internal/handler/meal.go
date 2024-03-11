@@ -2,6 +2,8 @@ package handler
 
 import (
 	"intern-bcc/entity"
+	"intern-bcc/model"
+	"intern-bcc/pkg/response"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,30 +14,21 @@ func (u *Handler) GetAllDataMeal(c *gin.Context) {
 
 	findData, err := u.Service.MealService.FindAll()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err,
-		})
+		response.Error(c, http.StatusInternalServerError, "fail to get data", err)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": findData,
-	})
+	response.Success(c, http.StatusOK, "success to get data", findData)
 }
 
 func (u *Handler) NewDataMeal(c *gin.Context) {
-	var newmeal entity.NewMeal
+	var newmeal model.NewMeal
 
 	c.ShouldBindJSON(&newmeal)
 
 	newMeal, err := u.Service.MealService.Create(newmeal)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err,
-		})
+		response.Error(c, http.StatusBadRequest, "fail to make a new meal data", err)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"massage": "Data meal berhasil ditambahkan",
-		"data":    newMeal,
-	})
+	response.Success(c, http.StatusAccepted, "success to make a new meal data", newMeal)
 }

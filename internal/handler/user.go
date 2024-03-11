@@ -2,6 +2,8 @@ package handler
 
 import (
 	"intern-bcc/entity"
+	"intern-bcc/model"
+	"intern-bcc/pkg/response"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,20 +25,14 @@ func (u *Handler) GetAllDataUser(c *gin.Context) {
 }
 
 func (u *Handler) NewDataUser(c *gin.Context) {
-	var newuser entity.NewUser
+	var newuser model.NewUser
 
 	c.ShouldBindJSON(&newuser)
 
 	newUser, err := u.Service.UserService.Create(newuser)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err,
-		})
+		response.Error(c, http.StatusBadRequest, "fail to make a new user", err)
 	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"massage": "Data user berhasil ditambahkan",
-		"data":    newUser,
-	})
+	response.Success(c, http.StatusAccepted, "success to make a new user", newUser)
 }
 

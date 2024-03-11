@@ -3,12 +3,13 @@ package service
 import (
 	"intern-bcc/entity"
 	"intern-bcc/internal/repository"
+	"intern-bcc/model"
 )
 
 type UserServiceInterface interface {
 	FindAll() ([]entity.User, error)
 	FindByID(ID int) (entity.User, error)
-	Create(user entity.NewUser) (entity.User, error)
+	Create(user model.NewUser) (entity.User, error)
 }
 
 type UserService struct {
@@ -19,7 +20,7 @@ func NewUserService(repository repository.UserRepositoryInterface) UserServiceIn
 	return &UserService{repository}
 }
 
-func (m *UserService) Create(user entity.NewUser) (entity.User, error) {
+func (m *UserService) Create(user model.NewUser) (entity.User, error) {
 	nuser := entity.User{
 		Name:     user.Name,
 		Email:    user.Email,
