@@ -17,7 +17,7 @@ func main() {
 
 	newService := service.NewService(newRepository)
 
-	newHandler := handler.NewUserHandler(newService)
+	newHandler := handler.NewHandler(newService)
 
 	mysql.Migration(db)
 
