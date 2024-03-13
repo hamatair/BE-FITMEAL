@@ -1,7 +1,9 @@
 package repository
 
 import (
+	"fmt"
 	"intern-bcc/entity"
+	"intern-bcc/model"
 
 	"gorm.io/gorm"
 )
@@ -10,6 +12,7 @@ type UserRepositoryInterface interface {
 	FindAll() ([]entity.User, error)
 	FindByID(ID int) (entity.User, error)
 	Create(user entity.User) (entity.User, error)
+	UserPersonalization(user model.Personalization, name string) (entity.User, error)
 }
 
 type UserRepository struct {
@@ -38,4 +41,26 @@ func (u *UserRepository) FindByID(ID int) (entity.User, error) {
 	err := u.db.Where("id = ?", ID).First(&user).Error
 
 	return user, err
+}
+
+func (u *UserRepository) UserPersonalization(user model.Personalization, name string) (entity.User, error) {
+	var data entity.User
+	err := u.db.Where("name = ?", name).First(&data).Error
+	if err != nil {
+		fmt.Println("di First ada", err)
+	}
+
+	data.Aktivitas = user.Aktivitas
+	data.Alamat = user.Alamat
+	data.Gender = user.Gender
+	data.BeratBadan = user.BeratBadan
+	data.TinggiBadan = user.TinggiBadan
+	data.Umur = user.Umur
+
+	err = u.db.Where("name = ?", name).Updates(&data).Error
+	if err != nil {
+		fmt.Println("pada save ada", err)
+	}
+
+	return data, err
 }

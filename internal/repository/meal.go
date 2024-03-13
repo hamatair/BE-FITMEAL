@@ -8,7 +8,7 @@ import (
 
 type MealRepositoryInterface interface {
 	FindAll() ([]entity.Meal, error)
-	FindByID(ID int) (entity.Meal, error)
+	FindByName(name string) (entity.Meal, error)
 	Create(user entity.Meal) (entity.Meal, error)
 }
 
@@ -35,9 +35,9 @@ func (m *MealRepository) FindAll() ([]entity.Meal, error) {
 	return meal, err
 }
 
-func (m *MealRepository) FindByID(ID int) (entity.Meal, error) {
+func (m *MealRepository) FindByName(name string) (entity.Meal, error) {
 	var meal entity.Meal
-	err := m.db.Where("id = ?", ID).First(&meal).Error
+	err := m.db.Where("name = ?", name).First(&meal).Error
 
 	return meal, err
 }

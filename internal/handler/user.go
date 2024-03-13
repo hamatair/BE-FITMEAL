@@ -13,7 +13,7 @@ func (u *Handler) GetAllDataUser(c *gin.Context) {
 	var findData []entity.User
 
 	findData, err := u.Service.UserService.FindAll()
-	if err != nil{
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err,
 		})
@@ -24,15 +24,39 @@ func (u *Handler) GetAllDataUser(c *gin.Context) {
 	})
 }
 
-func (u *Handler) NewDataUser(c *gin.Context) {
-	var newuser model.NewUser
+func (h *Handler) UserRegister(c *gin.Context) {
+	param := model.Register{}
 
-	c.ShouldBindJSON(&newuser)
-
-	newUser, err := u.Service.UserService.Create(newuser)
+	err := c.ShouldBindJSON(&param)
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "fail to make a new user", err)
+		response.Error(c, http.StatusBadRequest, "failed to bind input", err)
+		return
 	}
-	response.Success(c, http.StatusAccepted, "success to make a new user", newUser)
+
+	newUser, err := h.Service.UserService.Create(param)
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "failed to register new user", err)
+		return
+	}
+
+	response.Success(c, http.StatusCreated, "success register new user", newUser)
 }
 
+func (h *Handler) UserPersonalization(c *gin.Context) {
+	str := c.Param("name")
+
+	param := model.Personalization{}
+
+	err := c.ShouldBindJSON(&param)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Failed to bind input", err)
+	}
+
+	user, err := h.Service.UserService.UserPersonalization(param, str)
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "failed to personalize data user", err)
+	}
+
+	response.Success(c, http.StatusAccepted, "success to personalization", user)
+
+}
