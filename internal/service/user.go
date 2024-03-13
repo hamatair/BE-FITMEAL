@@ -15,38 +15,42 @@ type UserServiceInterface interface {
 	FindAll() ([]entity.User, error)
 	FindByID(ID int) (entity.User, error)
 	Create(user model.Register) (entity.User, error)
-	UserPersonalization(user model.Personalization, name string) (entity.User, error)
+	UserEditProfile(user model.EditProfile, name string) (entity.User, error)
 	Login(param model.Login) (model.LoginResponse, error)
 	GetUser(param model.UserParam) (entity.User, error)
 }
 
 type UserService struct {
 	userRepository repository.UserRepositoryInterface
-	bcrypt bcrypt.Interface
-	jwtAuth jwt.Interface
+	bcrypt         bcrypt.Interface
+	jwtAuth        jwt.Interface
 }
 
 func NewUserService(repository repository.UserRepositoryInterface, bcrypt bcrypt.Interface, jwtAuth jwt.Interface) UserServiceInterface {
 	return &UserService{
 		userRepository: repository,
-		bcrypt: bcrypt,
-		jwtAuth: jwtAuth,
+		bcrypt:         bcrypt,
+		jwtAuth:        jwtAuth,
 	}
 }
 
 func (u *UserService) Create(param model.Register) (entity.User, error) {
 	hashPassword, err := u.bcrypt.GenerateFromPassword(param.Password)
-	if err != nil{
-		return  entity.User{}, err
+	if err != nil {
+		return entity.User{}, err
 	}
 
 	param.ID = uuid.New()
 	param.Password = hashPassword
 	nuser := entity.User{
-		ID:       param.ID,
-		Name:     param.Name,
-		Email:    param.Email,
-		Password: param.Password,
+		ID:        param.ID,
+		Name:      param.Name,
+		Email:     param.Email,
+		Password:  param.Password,
+		Aktivitas: param.Aktivitas,
+		Gender:    param.Gender,
+		Umur:      param.Umur,
+		Alamat:    param.Alamat,
 	}
 
 	newUser, err := u.userRepository.Create(nuser)
@@ -55,7 +59,7 @@ func (u *UserService) Create(param model.Register) (entity.User, error) {
 
 }
 
-func (u*UserService) FindAll() ([]entity.User, error) {
+func (u *UserService) FindAll() ([]entity.User, error) {
 	user, err := u.userRepository.FindAll()
 
 	return user, err
@@ -67,12 +71,12 @@ func (u *UserService) FindByID(ID int) (entity.User, error) {
 	return user, err
 }
 
-func (u *UserService) UserPersonalization(user model.Personalization, name string) (entity.User, error){
-	UserPersonalization , err := u.userRepository.UserPersonalization(user, name)
-	if err != nil{
+func (u *UserService) UserEditProfile(user model.EditProfile, name string) (entity.User, error) {
+	UserPersonalization, err := u.userRepository.UserEditProfile(user, name)
+	if err != nil {
 		fmt.Println("service", err)
 	}
-	
+
 	return UserPersonalization, err
 }
 
