@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"fmt"
 	"intern-bcc/internal/service"
 	"intern-bcc/pkg/middleware"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,5 +34,5 @@ func (h *Handler) EndPoint() {
 	v1.POST("/user", h.UserRegister)
 	v1.PATCH("/tes/:name", h.UserPersonalization)
 
-	h.Router.Run(":5000")
+	h.Router.Run(fmt.Sprintf(":%s", os.Getenv("APP_PORT")))
 }
