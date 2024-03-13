@@ -52,7 +52,7 @@ func (j *jsonWebToken) CreateJWTToken(userID uuid.UUID) (string, error) {
 		},
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodPS256, claim)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 
 	tokenString, err := token.SignedString([]byte(j.SecretKey))
 	if err != nil{

@@ -27,13 +27,12 @@ func (h *Handler) EndPoint() {
 	h.Router.Use(h.Middleware.TimeoutMiddleware())
 	v1 := h.Router.Group("/v1")
 
-	// v1.POST("/user", h.NewDataUser)
 	v1.GET("/user", h.GetAllDataUser)
 	v1.POST("/meal", h.NewDataMeal)
 	v1.GET("/meal", h.GetAllDataMeal)
 	v1.POST("/user", h.UserRegister)
 	v1.PATCH("/tes/:name", h.UserPersonalization)
-	
+	v1.POST("user/login", h.Login)
 
-	h.Router.Run(fmt.Sprintf(":%s", os.Getenv("APP_PORT")))
+	h.Router.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }
