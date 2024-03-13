@@ -16,6 +16,8 @@ type UserServiceInterface interface {
 	FindByID(ID int) (entity.User, error)
 	Create(user model.Register) (entity.User, error)
 	UserPersonalization(user model.Personalization, name string) (entity.User, error)
+	Login(param model.Login) (model.LoginResponse, error)
+	GetUser(param model.UserParam) (entity.User, error)
 }
 
 type UserService struct {
@@ -72,4 +74,33 @@ func (u *UserService) UserPersonalization(user model.Personalization, name strin
 	}
 	
 	return UserPersonalization, err
+}
+
+func (u *UserService) Login(param model.Login) (model.LoginResponse, error) {
+	result := model.LoginResponse{}
+
+	user, err := u.userRepository.GetUser(model.UserParam{
+		Email: param.Email,
+	})
+	if err != nil {
+		return result, err
+	}
+
+	err = u.bcrypt.CompareAndHashPassword(user.Password, param.Password)
+	if err != nil {
+		return result, err
+	}
+
+	token, err := u.jwtAuth.CreateJWTToken(user.ID)
+	if err != nil {
+		return result, err
+	}
+
+	result.Token = token
+
+	return result, nil
+}
+
+func (u *UserService) GetUser(param model.UserParam) (entity.User, error) {
+	return u.userRepository.GetUser(param)
 }

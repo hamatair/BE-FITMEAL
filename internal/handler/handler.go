@@ -33,6 +33,7 @@ func (h *Handler) EndPoint() {
 	v1.GET("/meal", h.GetAllDataMeal)
 	v1.POST("/user", h.UserRegister)
 	v1.PATCH("/tes/:name", h.UserPersonalization)
+	
 
 	h.Router.Run(fmt.Sprintf(":%s", os.Getenv("APP_PORT")))
 }

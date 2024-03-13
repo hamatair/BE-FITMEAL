@@ -13,6 +13,7 @@ type UserRepositoryInterface interface {
 	FindByID(ID int) (entity.User, error)
 	Create(user entity.User) (entity.User, error)
 	UserPersonalization(user model.Personalization, name string) (entity.User, error)
+	GetUser(param model.UserParam) (entity.User, error)
 }
 
 type UserRepository struct {
@@ -63,4 +64,14 @@ func (u *UserRepository) UserPersonalization(user model.Personalization, name st
 	}
 
 	return data, err
+}
+
+func (u *UserRepository) GetUser(param model.UserParam) (entity.User, error) {
+	user := entity.User{}
+	err := u.db.Debug().Where(&param).First(&user).Error
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
 }

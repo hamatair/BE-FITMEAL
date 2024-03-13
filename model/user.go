@@ -17,3 +17,19 @@ type Personalization struct {
 	BeratBadan  uint   `json:"beratbadan" gorm:"not null;" binding:"required,number"`
 	TinggiBadan uint   `json:"tinggibadan" gorm:"not null;" binding:"required,number"`
 }
+
+type Login struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=8"`
+}
+
+type UserParam struct {
+	ID       uuid.UUID `json:"-"`
+	Name     string    `json:"-"`
+	Email    string    `json:"-"`
+	Password string    `json:"-"`
+}
+
+type LoginResponse struct {
+	Token string `json:"token"`
+}
