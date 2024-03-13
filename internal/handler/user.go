@@ -24,7 +24,7 @@ func (u *Handler) GetAllDataUser(c *gin.Context) {
 	})
 }
 
-func (h *Handler) UserRegister(c *gin.Context) {
+func (h *Handler) UserRegisterAndPersonalization(c *gin.Context) {
 	param := model.Register{}
 
 	err := c.ShouldBindJSON(&param)
@@ -42,17 +42,17 @@ func (h *Handler) UserRegister(c *gin.Context) {
 	response.Success(c, http.StatusCreated, "success register new user", newUser)
 }
 
-func (h *Handler) UserPersonalization(c *gin.Context) {
+func (h *Handler) UserEditProfile(c *gin.Context) {
 	str := c.Param("name")
 
-	param := model.Personalization{}
+	param := model.EditProfile{}
 
 	err := c.ShouldBindJSON(&param)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Failed to bind input", err)
 	}
 
-	user, err := h.Service.UserService.UserPersonalization(param, str)
+	user, err := h.Service.UserService.UserEditProfile(param, str)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "failed to personalize data user", err)
 	}

@@ -12,7 +12,7 @@ type UserRepositoryInterface interface {
 	FindAll() ([]entity.User, error)
 	FindByID(ID int) (entity.User, error)
 	Create(user entity.User) (entity.User, error)
-	UserPersonalization(user model.Personalization, name string) (entity.User, error)
+	UserEditProfile(user model.EditProfile, name string) (entity.User, error)
 	GetUser(param model.UserParam) (entity.User, error)
 }
 
@@ -44,7 +44,7 @@ func (u *UserRepository) FindByID(ID int) (entity.User, error) {
 	return user, err
 }
 
-func (u *UserRepository) UserPersonalization(user model.Personalization, name string) (entity.User, error) {
+func (u *UserRepository) UserEditProfile(user model.EditProfile, name string) (entity.User, error) {
 	var data entity.User
 	err := u.db.Where("name = ?", name).First(&data).Error
 	if err != nil {

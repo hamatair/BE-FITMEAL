@@ -30,8 +30,8 @@ func (h *Handler) EndPoint() {
 	v1.GET("/user", h.GetAllDataUser)
 	v1.POST("/meal", h.NewDataMeal)
 	v1.GET("/meal", h.GetAllDataMeal)
-	v1.POST("/user", h.UserRegister)
-	v1.PATCH("/tes/:name", h.UserPersonalization)
+	v1.POST("/user", h.UserRegisterAndPersonalization)
+	v1.PATCH("/tes/:name", h.UserEditProfile)
 	v1.POST("user/login", h.Login)
 
 	port := os.Getenv("PORT")

@@ -15,7 +15,7 @@ type UserServiceInterface interface {
 	FindAll() ([]entity.User, error)
 	FindByID(ID int) (entity.User, error)
 	Create(user model.Register) (entity.User, error)
-	UserPersonalization(user model.Personalization, name string) (entity.User, error)
+	UserEditProfile(user model.EditProfile, name string) (entity.User, error)
 	Login(param model.Login) (model.LoginResponse, error)
 	GetUser(param model.UserParam) (entity.User, error)
 }
@@ -43,10 +43,14 @@ func (u *UserService) Create(param model.Register) (entity.User, error) {
 	param.ID = uuid.New()
 	param.Password = hashPassword
 	nuser := entity.User{
-		ID:       param.ID,
-		Name:     param.Name,
-		Email:    param.Email,
-		Password: param.Password,
+		ID:        param.ID,
+		Name:      param.Name,
+		Email:     param.Email,
+		Password:  param.Password,
+		Aktivitas: param.Aktivitas,
+		Gender:    param.Gender,
+		Umur:      param.Umur,
+		Alamat:    param.Alamat,
 	}
 
 	newUser, err := u.userRepository.Create(nuser)
@@ -67,8 +71,8 @@ func (u *UserService) FindByID(ID int) (entity.User, error) {
 	return user, err
 }
 
-func (u *UserService) UserPersonalization(user model.Personalization, name string) (entity.User, error) {
-	UserPersonalization, err := u.userRepository.UserPersonalization(user, name)
+func (u *UserService) UserEditProfile(user model.EditProfile, name string) (entity.User, error) {
+	UserPersonalization, err := u.userRepository.UserEditProfile(user, name)
 	if err != nil {
 		fmt.Println("service", err)
 	}
