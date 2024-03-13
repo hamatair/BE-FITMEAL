@@ -23,8 +23,6 @@ type jsonWebToken struct {
 	ExpiredTime time.Duration
 }
 
-
-
 type Claims struct {
 	UserID uuid.UUID
 	jwt.RegisteredClaims

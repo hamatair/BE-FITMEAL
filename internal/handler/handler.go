@@ -34,5 +34,9 @@ func (h *Handler) EndPoint() {
 	v1.PATCH("/tes/:name", h.UserPersonalization)
 	v1.POST("user/login", h.Login)
 
-	h.Router.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "5000"
+	}
+	h.Router.Run(fmt.Sprintf(":%s", port))
 }

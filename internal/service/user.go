@@ -22,22 +22,22 @@ type UserServiceInterface interface {
 
 type UserService struct {
 	userRepository repository.UserRepositoryInterface
-	bcrypt bcrypt.Interface
-	jwtAuth jwt.Interface
+	bcrypt         bcrypt.Interface
+	jwtAuth        jwt.Interface
 }
 
 func NewUserService(repository repository.UserRepositoryInterface, bcrypt bcrypt.Interface, jwtAuth jwt.Interface) UserServiceInterface {
 	return &UserService{
 		userRepository: repository,
-		bcrypt: bcrypt,
-		jwtAuth: jwtAuth,
+		bcrypt:         bcrypt,
+		jwtAuth:        jwtAuth,
 	}
 }
 
 func (u *UserService) Create(param model.Register) (entity.User, error) {
 	hashPassword, err := u.bcrypt.GenerateFromPassword(param.Password)
-	if err != nil{
-		return  entity.User{}, err
+	if err != nil {
+		return entity.User{}, err
 	}
 
 	param.ID = uuid.New()
@@ -55,7 +55,7 @@ func (u *UserService) Create(param model.Register) (entity.User, error) {
 
 }
 
-func (u*UserService) FindAll() ([]entity.User, error) {
+func (u *UserService) FindAll() ([]entity.User, error) {
 	user, err := u.userRepository.FindAll()
 
 	return user, err
@@ -67,12 +67,12 @@ func (u *UserService) FindByID(ID int) (entity.User, error) {
 	return user, err
 }
 
-func (u *UserService) UserPersonalization(user model.Personalization, name string) (entity.User, error){
-	UserPersonalization , err := u.userRepository.UserPersonalization(user, name)
-	if err != nil{
+func (u *UserService) UserPersonalization(user model.Personalization, name string) (entity.User, error) {
+	UserPersonalization, err := u.userRepository.UserPersonalization(user, name)
+	if err != nil {
 		fmt.Println("service", err)
 	}
-	
+
 	return UserPersonalization, err
 }
 
