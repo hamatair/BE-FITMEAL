@@ -1,1 +1,1 @@
-web: /cmd/app/app
+web: ./cmd/app/app
