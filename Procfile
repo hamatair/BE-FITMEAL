@@ -1,1 +1,1 @@
-web: ./cmd/app/app
+web: go run cmd/app/main.go
