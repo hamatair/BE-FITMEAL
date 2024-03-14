@@ -25,7 +25,7 @@ func (u *Handler) NewDataMeal(c *gin.Context) {
 
 	c.ShouldBindJSON(&newmeal)
 
-	newMeal, err := u.Service.MealService.Create(newmeal)
+	newMeal, err := u.Service.MealService.CreateNewDataMeal(newmeal)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "fail to make a new meal data", err)
 	}

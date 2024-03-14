@@ -24,7 +24,7 @@ func main() {
 
 	newService := service.NewService(service.InitParam{Repository: newRepository, JwtAuth: jwtAuth, Bcrypt: bCrypt})
 
-	middleware := middleware.Init(newService)
+	middleware := middleware.Init(jwtAuth,newService)
 
 	newHandler := handler.NewHandler(newService, middleware)
 

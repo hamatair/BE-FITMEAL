@@ -5,7 +5,9 @@ import (
 	"intern-bcc/internal/service"
 	"intern-bcc/pkg/middleware"
 	"os"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,14 +27,24 @@ func NewHandler(service *service.Service, middleware middleware.Interface) *Hand
 
 func (h *Handler) EndPoint() {
 	h.Router.Use(h.Middleware.TimeoutMiddleware())
+	h.Router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"*"},
+		AllowHeaders:     []string{"*"},
+		ExposeHeaders:    []string{"*"},
+		AllowCredentials: true,
+	
+		MaxAge: 12 * time.Hour,
+	  }))
 	v1 := h.Router.Group("/v1")
 
 	v1.GET("/user", h.GetAllDataUser)
 	v1.POST("/meal", h.NewDataMeal)
 	v1.GET("/meal", h.GetAllDataMeal)
-	v1.POST("/user", h.UserRegisterAndPersonalization)
+	v1.POST("/user/register", h.UserRegisterAndPersonalization)
 	v1.PATCH("/tes/:name", h.UserEditProfile)
 	v1.POST("user/login", h.Login)
+	v1.POST("user/login-user", h.Middleware.AuthenticateUser, h.getLoginUser)
 
 	port := os.Getenv("PORT")
 	if port == "" {

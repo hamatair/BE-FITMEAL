@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"intern-bcc/entity"
 	"intern-bcc/model"
 	"intern-bcc/pkg/response"
@@ -39,7 +40,7 @@ func (h *Handler) UserRegisterAndPersonalization(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, http.StatusCreated, "success register new user", newUser)
+	response.Success(c, http.StatusCreated, "success create new user", newUser)
 }
 
 func (h *Handler) UserEditProfile(c *gin.Context) {
@@ -76,6 +77,15 @@ func (h *Handler) Login(ctx *gin.Context) {
 		return
 	}
 
-	response.Success(ctx, http.StatusOK, "success login to system", token)
+	response.Success(ctx, http.StatusOK, "success login", token)
 }
 
+func (h *Handler) getLoginUser(c *gin.Context) {
+	user, ok := c.Get("user")
+	if !ok {
+		response.Error(c, http.StatusInternalServerError, "failed get login user", errors.New(""))
+		return
+	}
+
+	response.Success(c, http.StatusOK, "get login user", user.(entity.User))
+}

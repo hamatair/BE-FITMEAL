@@ -53,7 +53,7 @@ func (j *jsonWebToken) CreateJWTToken(userID uuid.UUID) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 
 	tokenString, err := token.SignedString([]byte(j.SecretKey))
-	if err != nil{
+	if err != nil {
 		return tokenString, err
 	}
 
@@ -66,6 +66,24 @@ func (*jsonWebToken) GetLoginUser(c *gin.Context) (entity.User, error) {
 }
 
 // ValidateToken implements Interface.
-func (*jsonWebToken) ValidateToken(token string) (uuid.UUID, error) {
-	panic("unimplemented")
+func (j *jsonWebToken) ValidateToken(tokenString string) (uuid.UUID, error) {
+	var (
+		claims Claims
+		userId uuid.UUID
+	)
+
+	token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(j.SecretKey), nil
+	})
+	if err != nil {
+		return userId, err
+	}
+
+	if !token.Valid {
+		return userId, err
+	}
+
+	userId = claims.UserID
+
+	return userId, nil
 }

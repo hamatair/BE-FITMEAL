@@ -9,7 +9,7 @@ import (
 type MealRepositoryInterface interface {
 	FindAll() ([]entity.Meal, error)
 	FindByName(name string) (entity.Meal, error)
-	Create(user entity.Meal) (entity.Meal, error)
+	CreateNewDataMeal(user entity.Meal) (entity.Meal, error)
 }
 
 type MealRepository struct {
@@ -22,7 +22,7 @@ func NewMealRepository(db *gorm.DB) MealRepositoryInterface {
 	}
 }
 
-func (m *MealRepository) Create(meal entity.Meal) (entity.Meal, error) {
+func (m *MealRepository) CreateNewDataMeal(meal entity.Meal) (entity.Meal, error) {
 	err := m.db.Create(&meal).Error
 
 	return meal, err

@@ -3,6 +3,7 @@ package middleware
 import (
 	"errors"
 	"intern-bcc/internal/service"
+	"intern-bcc/pkg/jwt"
 	"intern-bcc/pkg/response"
 	"net/http"
 	"os"
@@ -15,14 +16,17 @@ import (
 
 type Interface interface {
 	TimeoutMiddleware() gin.HandlerFunc
+	AuthenticateUser(ctx *gin.Context)
 }
 
 type Middleware struct {
+	jwtauth jwt.Interface
 	service *service.Service
 }
 
-func Init(service *service.Service) Interface {
+func Init(jwtauth jwt.Interface, service *service.Service) Interface {
 	return &Middleware{
+		jwtauth: jwtauth,
 		service: service,
 	}
 }

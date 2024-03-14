@@ -11,8 +11,8 @@ type Register struct {
 	Gender      string    `json:"gender" gorm:"type:varchar(255);not null;" binding:"required"`
 	Umur        uint      `json:"umur" gorm:"type:varchar(255);not null;" binding:"required"`
 	Alamat      string    `json:"alamat" gorm:"type:varchar(255);not null;" binding:"required"`
-	BeratBadan  uint      `json:"beratbadan" binding:"required,number"`
-	TinggiBadan uint      `json:"tinggibadan" binding:"required,number"`
+	BeratBadan  uint      `json:"beratBadan" binding:"required,number"`
+	TinggiBadan uint      `json:"tinggiBadan" binding:"required,number"`
 }
 
 type EditProfile struct {
@@ -20,8 +20,8 @@ type EditProfile struct {
 	Gender      string `json:"gender" gorm:"type:varchar(255);not null;" binding:"required"`
 	Umur        uint   `json:"umur" gorm:"not null;" binding:"required"`
 	Alamat      string `json:"alamat" gorm:"type:varchar(255);not null;" binding:"required"`
-	BeratBadan  uint   `json:"beratbadan" gorm:"not null;" binding:"required,number"`
-	TinggiBadan uint   `json:"tinggibadan" gorm:"not null;" binding:"required,number"`
+	BeratBadan  uint   `json:"beratBadan" gorm:"not null;" binding:"required,number"`
+	TinggiBadan uint   `json:"tinggiBadan" gorm:"not null;" binding:"required,number"`
 }
 
 type Login struct {

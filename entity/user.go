@@ -15,8 +15,8 @@ type User struct {
 	Gender      string    `json:"gender" gorm:"type:varchar(255);not null;" binding:"required"`
 	Umur        uint      `json:"umur" gorm:"type:varchar(255);not null;" binding:"required"`
 	Alamat      string    `json:"alamat" gorm:"type:varchar(255);not null;" binding:"required"`
-	BeratBadan  uint      `json:"beratbadan" binding:"required,number"`
-	TinggiBadan uint      `json:"tinggibadan" binding:"required,number"`
+	BeratBadan  uint      `json:"beratBadan" binding:"required,number"`
+	TinggiBadan uint      `json:"tinggiBadan" binding:"required,number"`
 	CreatedAt   time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt   time.Time `json:"updatedAt" gorm:"autoUpdateTime"`
 }

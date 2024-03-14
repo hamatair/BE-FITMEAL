@@ -4,12 +4,14 @@ import (
 	"intern-bcc/entity"
 	"intern-bcc/internal/repository"
 	"intern-bcc/model"
+
+	"github.com/google/uuid"
 )
 
 type MealServiceInterface interface {
 	FindAll() ([]entity.Meal, error)
 	FindByName(name string) (entity.Meal, error)
-	Create(user model.NewMeal) (entity.Meal, error)
+	CreateNewDataMeal(user model.NewMeal) (entity.Meal, error)
 }
 
 type MealService struct {
@@ -20,8 +22,10 @@ func NewMealService(repository repository.MealRepositoryInterface) MealServiceIn
 	return &MealService{repository}
 }
 
-func (m *MealService) Create(meal model.NewMeal) (entity.Meal, error) {
+func (m *MealService) CreateNewDataMeal(meal model.NewMeal) (entity.Meal, error) {
+	meal.ID = uuid.New()
 	nmeal := entity.Meal{
+		ID:          meal.ID,
 		Name:        meal.Name,
 		Kalori:      meal.Kalori,
 		Protein:     meal.Protein,
@@ -29,7 +33,7 @@ func (m *MealService) Create(meal model.NewMeal) (entity.Meal, error) {
 		Lemak:       meal.Lemak,
 	}
 
-	newMeal, err := m.mealRepository.Create(nmeal)
+	newMeal, err := m.mealRepository.CreateNewDataMeal(nmeal)
 
 	return newMeal, err
 

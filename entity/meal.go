@@ -2,10 +2,12 @@ package entity
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Meal struct {
-	ID          uint      `json:"id" gorm:"primary_key;"`
+	ID          uuid.UUID `json:"id" gorm:"primary_key;"`
 	Name        string    `json:"name" binding:"required"`
 	Kalori      uint      `json:"kalori" binding:"required"`
 	Protein     uint      `json:"protein" binding:"required"`

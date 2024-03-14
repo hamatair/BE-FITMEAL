@@ -51,6 +51,8 @@ func (u *UserService) Create(param model.Register) (entity.User, error) {
 		Gender:    param.Gender,
 		Umur:      param.Umur,
 		Alamat:    param.Alamat,
+		BeratBadan: param.BeratBadan,
+		TinggiBadan: param.TinggiBadan,
 	}
 
 	newUser, err := u.userRepository.Create(nuser)
