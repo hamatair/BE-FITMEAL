@@ -5,7 +5,6 @@ import (
 	"intern-bcc/internal/service"
 	"intern-bcc/pkg/middleware"
 	"os"
-	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -32,11 +31,9 @@ func (h *Handler) EndPoint() {
 		AllowHeaders:     []string{"*"},
 		ExposeHeaders:    []string{"*"},
 		AllowCredentials: true,
-	
-		MaxAge: 12 * time.Hour,
-	  }))
+	}))
 	h.Router.Use(h.Middleware.TimeoutMiddleware())
-	
+
 	v1 := h.Router.Group("/v1")
 
 	v1.GET("/user", h.GetAllDataUser)
