@@ -26,7 +26,6 @@ func NewHandler(service *service.Service, middleware middleware.Interface) *Hand
 }
 
 func (h *Handler) EndPoint() {
-	h.Router.Use(h.Middleware.TimeoutMiddleware())
 	h.Router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"*"},
@@ -36,6 +35,8 @@ func (h *Handler) EndPoint() {
 	
 		MaxAge: 12 * time.Hour,
 	  }))
+	h.Router.Use(h.Middleware.TimeoutMiddleware())
+	
 	v1 := h.Router.Group("/v1")
 
 	v1.GET("/user", h.GetAllDataUser)
