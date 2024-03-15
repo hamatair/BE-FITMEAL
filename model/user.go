@@ -4,7 +4,7 @@ import "github.com/google/uuid"
 
 type Register struct {
 	ID          uuid.UUID `json:"-"`
-	UserName    string    `json:"userName" binding:"required"`
+	UserName    string    `json:"userName"`
 	Email       string    `json:"email" binding:"required,email"`
 	Password    string    `json:"password" binding:"required,min=8"`
 	Aktivitas   string    `json:"aktivitas" gorm:"type:varchar(255);not null;" binding:"required"`

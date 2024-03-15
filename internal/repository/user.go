@@ -85,6 +85,11 @@ func (u *UserRepository) UserChangePassword(param model.ChangePassword, id strin
 
 	data.Password = param.NewPassword
 
+	err = u.db.Where("id = ?", id).Updates(&data).Error
+	if err != nil {
+		fmt.Println("pada save ada", err)
+	}
+
 	return data, err
 
 }
