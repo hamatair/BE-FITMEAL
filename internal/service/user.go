@@ -104,6 +104,7 @@ func (u *UserService) Login(param model.Login) (model.LoginResponse, error) {
 	}
 
 	result.Token = token
+	result.ID = user.ID
 
 	return result, nil
 }
@@ -112,19 +113,19 @@ func (u *UserService) GetUser(param model.UserParam) (entity.User, error) {
 	return u.userRepository.GetUser(param)
 }
 
-func (u * UserService) UserChangePassword(param model.ChangePassword, id string) (entity.User, error) {
+func (u *UserService) UserChangePassword(param model.ChangePassword, id string) (entity.User, error) {
 	param.OldPassword, _ = u.bcrypt.GenerateFromPassword(param.OldPassword)
-	cekUser , err := u.userRepository.GetUser(model.UserParam{
+	cekUser, err := u.userRepository.GetUser(model.UserParam{
 		Password: param.OldPassword,
 	})
 
 	newpassword, _ := u.bcrypt.GenerateFromPassword(param.NewPassword)
-	if u.bcrypt.CompareAndHashPassword(newpassword, param.ConfirmPassword) != nil{
+	if u.bcrypt.CompareAndHashPassword(newpassword, param.ConfirmPassword) != nil {
 		return cekUser, err
 	}
 
 	param.NewPassword = newpassword
-	user , err := u.userRepository.UserChangePassword(param, id)
+	user, err := u.userRepository.UserChangePassword(param, id)
 	if err != nil {
 		fmt.Println("service", err)
 	}

@@ -36,9 +36,9 @@ func (h *Handler) EndPoint() {
 
 	v1 := h.Router.Group("/v1")
 
-	v1.GET("/user", h.GetAllDataUser)
+	v1.GET("/user/get", h.GetAllDataUser)
 	v1.POST("/meal", h.NewDataMeal)
-	v1.GET("/meal", h.GetAllDataMeal)
+	v1.GET("/meal/get", h.GetAllDataMeal)
 	v1.POST("/user/register", h.UserRegisterAndPersonalization)
 	v1.PATCH("/user/edit-profile/:id", h.UserEditProfile)
 	v1.PATCH("/user/edit-profile/change-password/:id", h.changePasswordUser)
