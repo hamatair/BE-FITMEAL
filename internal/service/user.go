@@ -15,9 +15,10 @@ type UserServiceInterface interface {
 	FindAll() ([]entity.User, error)
 	FindByID(ID int) (entity.User, error)
 	Create(user model.Register) (entity.User, error)
-	UserEditProfile(user model.EditProfile, name string) (entity.User, error)
+	UserEditProfile(user model.EditProfile, id string) (entity.User, error)
 	Login(param model.Login) (model.LoginResponse, error)
 	GetUser(param model.UserParam) (entity.User, error)
+	UserChangePassword(param model.ChangePassword, id string) (entity.User, error)
 }
 
 type UserService struct {
@@ -43,15 +44,15 @@ func (u *UserService) Create(param model.Register) (entity.User, error) {
 	param.ID = uuid.New()
 	param.Password = hashPassword
 	nuser := entity.User{
-		ID:        param.ID,
-		Name:      param.Name,
-		Email:     param.Email,
-		Password:  param.Password,
-		Aktivitas: param.Aktivitas,
-		Gender:    param.Gender,
-		Umur:      param.Umur,
-		Alamat:    param.Alamat,
-		BeratBadan: param.BeratBadan,
+		ID:          param.ID,
+		UserName:    param.UserName,
+		Email:       param.Email,
+		Password:    param.Password,
+		Aktivitas:   param.Aktivitas,
+		Gender:      param.Gender,
+		Umur:        param.Umur,
+		Alamat:      param.Alamat,
+		BeratBadan:  param.BeratBadan,
 		TinggiBadan: param.TinggiBadan,
 	}
 
@@ -73,8 +74,8 @@ func (u *UserService) FindByID(ID int) (entity.User, error) {
 	return user, err
 }
 
-func (u *UserService) UserEditProfile(user model.EditProfile, name string) (entity.User, error) {
-	UserPersonalization, err := u.userRepository.UserEditProfile(user, name)
+func (u *UserService) UserEditProfile(user model.EditProfile, id string) (entity.User, error) {
+	UserPersonalization, err := u.userRepository.UserEditProfile(user, id)
 	if err != nil {
 		fmt.Println("service", err)
 	}
@@ -109,4 +110,24 @@ func (u *UserService) Login(param model.Login) (model.LoginResponse, error) {
 
 func (u *UserService) GetUser(param model.UserParam) (entity.User, error) {
 	return u.userRepository.GetUser(param)
+}
+
+func (u * UserService) UserChangePassword(param model.ChangePassword, id string) (entity.User, error) {
+	param.OldPassword, _ = u.bcrypt.GenerateFromPassword(param.OldPassword)
+	cekUser , err := u.userRepository.GetUser(model.UserParam{
+		Password: param.OldPassword,
+	})
+
+	newpassword, _ := u.bcrypt.GenerateFromPassword(param.NewPassword)
+	if u.bcrypt.CompareAndHashPassword(newpassword, param.ConfirmPassword) != nil{
+		return cekUser, err
+	}
+
+	param.NewPassword = newpassword
+	user , err := u.userRepository.UserChangePassword(param, id)
+	if err != nil {
+		fmt.Println("service", err)
+	}
+
+	return user, err
 }

@@ -12,8 +12,9 @@ type UserRepositoryInterface interface {
 	FindAll() ([]entity.User, error)
 	FindByID(ID int) (entity.User, error)
 	Create(user entity.User) (entity.User, error)
-	UserEditProfile(user model.EditProfile, name string) (entity.User, error)
+	UserEditProfile(user model.EditProfile, id string) (entity.User, error)
 	GetUser(param model.UserParam) (entity.User, error)
+	UserChangePassword(param model.ChangePassword, id string) (entity.User, error)
 }
 
 type UserRepository struct {
@@ -44,21 +45,20 @@ func (u *UserRepository) FindByID(ID int) (entity.User, error) {
 	return user, err
 }
 
-func (u *UserRepository) UserEditProfile(user model.EditProfile, name string) (entity.User, error) {
+func (u *UserRepository) UserEditProfile(user model.EditProfile, id string) (entity.User, error) {
 	var data entity.User
-	err := u.db.Where("name = ?", name).First(&data).Error
+	err := u.db.Where("id = ?", id).First(&data).Error
 	if err != nil {
 		fmt.Println("di First ada", err)
 	}
 
-	data.Aktivitas = user.Aktivitas
+	data.UserName = user.UserName
+	data.Umur = user.Umur
 	data.Alamat = user.Alamat
-	data.Gender = user.Gender
 	data.BeratBadan = user.BeratBadan
 	data.TinggiBadan = user.TinggiBadan
-	data.Umur = user.Umur
 
-	err = u.db.Where("name = ?", name).Updates(&data).Error
+	err = u.db.Where("id = ?", id).Updates(&data).Error
 	if err != nil {
 		fmt.Println("pada save ada", err)
 	}
@@ -74,4 +74,17 @@ func (u *UserRepository) GetUser(param model.UserParam) (entity.User, error) {
 	}
 
 	return user, nil
+}
+
+func (u *UserRepository) UserChangePassword(param model.ChangePassword, id string) (entity.User, error) {
+	var data entity.User
+	err := u.db.Where("id = ?", id).First(&data).Error
+	if err != nil {
+		fmt.Println("di pencarian ada", err)
+	}
+
+	data.Password = param.NewPassword
+
+	return data, err
+
 }

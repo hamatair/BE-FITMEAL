@@ -8,7 +8,7 @@ import (
 
 type User struct {
 	ID          uuid.UUID `json:"id" gorm:"primary_key;"`
-	Name        string    `json:"name" gorm:"type:varchar(255);not null;" binding:"required"`
+	UserName    string    `json:"userName" gorm:"type:varchar(255);not null;" binding:"required"`
 	Email       string    `json:"email" gorm:"type:varchar(255);not null;unique" binding:"required"`
 	Password    string    `json:"password" gorm:"type:varchar(255);not null;" binding:"required"`
 	Aktivitas   string    `json:"aktivitas" gorm:"type:varchar(255);not null;" binding:"required"`

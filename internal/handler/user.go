@@ -44,18 +44,20 @@ func (h *Handler) UserRegisterAndPersonalization(c *gin.Context) {
 }
 
 func (h *Handler) UserEditProfile(c *gin.Context) {
-	str := c.Param("name")
+	id := c.Param("id")
 
 	param := model.EditProfile{}
 
 	err := c.ShouldBindJSON(&param)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Failed to bind input", err)
+		c.Next()
 	}
 
-	user, err := h.Service.UserService.UserEditProfile(param, str)
+	user, err := h.Service.UserService.UserEditProfile(param, id)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "failed to personalize data user", err)
+		return
 	}
 
 	response.Success(c, http.StatusAccepted, "success to personalization", user)
@@ -88,4 +90,24 @@ func (h *Handler) getLoginUser(c *gin.Context) {
 	}
 
 	response.Success(c, http.StatusOK, "get login user", user.(entity.User))
+}
+
+func (h *Handler) changePasswordUser(c *gin.Context) {
+	id := c.Param("id")
+
+	param := model.ChangePassword{}
+
+	err := c.ShouldBindJSON(&param)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Failed to bind input", err)
+		return
+	}
+
+	user, err := h.Service.UserService.UserChangePassword(param, id)
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "failed to change password", err)
+		return
+	}
+
+	response.Success(c, http.StatusAccepted, "success to change password", user)
 }
