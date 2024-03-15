@@ -6,7 +6,7 @@ type Register struct {
 	ID          uuid.UUID `json:"-"`
 	UserName    string    `json:"userName" binding:"required"`
 	Email       string    `json:"email" binding:"required,email"`
-	Password    string    `json:"password" binding:"required,min=8"`
+	Password    string    `json:"password" binding:"required"`
 	Aktivitas   string    `json:"aktivitas" gorm:"type:varchar(255);not null;" binding:"required"`
 	Gender      string    `json:"gender" gorm:"type:varchar(255);not null;" binding:"required"`
 	Umur        uint      `json:"umur" gorm:"type:varchar(255);not null;" binding:"required"`
@@ -24,14 +24,14 @@ type EditProfile struct {
 }
 
 type ChangePassword struct {
-	OldPassword     string `json:"oldPassword" binding:"required,min=8"`
-	NewPassword     string `json:"newPassword" binding:"required,min=8"`
-	ConfirmPassword string `json:"confirmPassword" binding:"required,min=8"`
+	OldPassword     string `json:"oldPassword" binding:"required"`
+	NewPassword     string `json:"newPassword" binding:"required"`
+	ConfirmPassword string `json:"confirmPassword" binding:"required"`
 }
 
 type Login struct {
 	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=8"`
+	Password string `json:"password" binding:"required"`
 }
 
 type UserParam struct {
