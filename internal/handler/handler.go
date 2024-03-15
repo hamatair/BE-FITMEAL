@@ -37,6 +37,7 @@ func (h *Handler) EndPoint() {
 	v1 := h.Router.Group("/v1")
 
 	v1.GET("/user/get", h.GetAllDataUser)
+	v1.GET("/user/get/:id", h.GetUserById)
 	v1.POST("/meal", h.NewDataMeal)
 	v1.GET("/meal/get", h.GetAllDataMeal)
 	v1.POST("/user/register", h.UserRegisterAndPersonalization)

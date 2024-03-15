@@ -13,7 +13,6 @@ import (
 
 type UserServiceInterface interface {
 	FindAll() ([]entity.User, error)
-	FindByID(ID int) (entity.User, error)
 	Create(user model.Register) (entity.User, error)
 	UserEditProfile(user model.EditProfile, id string) (entity.User, error)
 	Login(param model.Login) (model.LoginResponse, error)
@@ -68,12 +67,6 @@ func (u *UserService) FindAll() ([]entity.User, error) {
 	return user, err
 }
 
-func (u *UserService) FindByID(ID int) (entity.User, error) {
-	user, err := u.userRepository.FindByID(ID)
-
-	return user, err
-}
-
 func (u *UserService) UserEditProfile(user model.EditProfile, id string) (entity.User, error) {
 	UserPersonalization, err := u.userRepository.UserEditProfile(user, id)
 	if err != nil {
@@ -114,13 +107,22 @@ func (u *UserService) GetUser(param model.UserParam) (entity.User, error) {
 }
 
 func (u *UserService) UserChangePassword(param model.ChangePassword, id string) (entity.User, error) {
-	param.OldPassword, _ = u.bcrypt.GenerateFromPassword(param.OldPassword)
+	uuid, _ := uuid.Parse(id)
 	cekUser, err := u.userRepository.GetUser(model.UserParam{
-		Password: param.OldPassword,
+		ID: uuid,
 	})
+	if err != nil {
+		return cekUser, err
+	}
+
+	err = u.bcrypt.CompareAndHashPassword(cekUser.Password, param.OldPassword)
+	if err != nil {
+		return cekUser, err
+	}
 
 	newpassword, _ := u.bcrypt.GenerateFromPassword(param.NewPassword)
-	if u.bcrypt.CompareAndHashPassword(newpassword, param.ConfirmPassword) != nil {
+	err = u.bcrypt.CompareAndHashPassword(newpassword, param.ConfirmPassword)
+	if err != nil {
 		return cekUser, err
 	}
 

@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func (u *Handler) GetAllDataUser(c *gin.Context) {
@@ -15,14 +16,25 @@ func (u *Handler) GetAllDataUser(c *gin.Context) {
 
 	findData, err := u.Service.UserService.FindAll()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err,
-		})
+		response.Error(c, http.StatusInternalServerError, "failed to get all data user", err)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": findData,
+	response.Success(c, http.StatusOK, "success to get all data user", findData)
+}
+
+func (u *Handler) GetUserById(c *gin.Context) {
+	param := c.Param("id")
+
+	uuid, _ := uuid.Parse(param)
+
+	findData, err := u.Service.UserService.GetUser(model.UserParam{
+		ID: uuid,
 	})
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "failed to get user data", err)
+	}
+
+	response.Success(c, http.StatusOK, "success to get user data", findData)
 }
 
 func (h *Handler) UserRegisterAndPersonalization(c *gin.Context) {

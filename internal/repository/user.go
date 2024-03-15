@@ -10,7 +10,6 @@ import (
 
 type UserRepositoryInterface interface {
 	FindAll() ([]entity.User, error)
-	FindByID(ID int) (entity.User, error)
 	Create(user entity.User) (entity.User, error)
 	UserEditProfile(user model.EditProfile, id string) (entity.User, error)
 	GetUser(param model.UserParam) (entity.User, error)
@@ -34,13 +33,6 @@ func (u *UserRepository) Create(user entity.User) (entity.User, error) {
 func (u *UserRepository) FindAll() ([]entity.User, error) {
 	var user []entity.User
 	err := u.db.Find(&user).Error
-
-	return user, err
-}
-
-func (u *UserRepository) FindByID(ID int) (entity.User, error) {
-	var user entity.User
-	err := u.db.Where("id = ?", ID).First(&user).Error
 
 	return user, err
 }
