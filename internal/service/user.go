@@ -34,56 +34,21 @@ func NewUserService(repository repository.UserRepositoryInterface, bcrypt bcrypt
 	}
 }
 
-// func hitungNutrisi(nuser entity.User) entity.User {
-// 	var kalori float32
-// 	if nuser.Gender == "male" {
-// 		kalori = 66 + (13.7*float32(nuser.BeratBadan) + (5 * float32(nuser.TinggiBadan)) - (6.8 * float32(nuser.Umur)))
-// 	} else if nuser.Gender == "female" {
-// 		kalori = 655 + (9.6*float32(nuser.BeratBadan) + (1.8 * float32(nuser.TinggiBadan)) - (4.7 * float32(nuser.Umur)))
-// 	}
-
-// 	if nuser.Aktivitas == "sangat jarang olahraga" {
-// 		kalori *= 1.2
-// 	} else if nuser.Aktivitas == "jarang olahraga" {
-// 		kalori *= 1.375
-// 	} else if nuser.Aktivitas == "sering olahraga" {
-// 		kalori *= 1.55
-// 	} else if nuser.Aktivitas == "sangat sering olahraga" {
-// 		kalori *= 1.725
-// 	}
-
-// 	protein := (0.15 * kalori) / 4
-// 	karbohidrat := (0.6 * kalori) / 4
-// 	lemak := (0.15 * kalori) / 9
-
-// 	nuser.Kalori = kalori
-// 	nuser.Protein = protein
-// 	nuser.Karbohidrat = karbohidrat
-// 	nuser.Lemak = lemak
-
-// 	return nuser
-// }
-
-func (u *UserService) Create(param model.Register) (entity.User, error) {
-	hashPassword, err := u.bcrypt.GenerateFromPassword(param.Password)
-	if err != nil {
-		return entity.User{}, err
-	}
-
+func hitungNutrisi(aktivitas string, gender string, umur uint, BB uint, TB uint) (float32, float32, float32, float32) {
 	var kalori float32
-	if param.Gender == "male" {
-		kalori = 66 + (13.7*float32(param.BeratBadan) + (5 * float32(param.TinggiBadan)) - (6.8 * float32(param.Umur)))
-	} else if param.Gender == "female" {
-		kalori = 655 + (9.6*float32(param.BeratBadan) + (1.8 * float32(param.TinggiBadan)) - (4.7 * float32(param.Umur)))
+	if gender == "male" {
+		kalori = 66 + (13.7*float32(BB) + (5 * float32(TB)) - (6.8 * float32(umur)))
+	} else if gender == "female" {
+		kalori = 655 + (9.6*float32(BB) + (1.8 * float32(TB)) - (4.7 * float32(umur)))
 	}
 
-	if param.Aktivitas == "sangat jarang olahraga" {
+	if aktivitas == "sangat jarang olahraga" {
 		kalori *= 1.2
-	} else if param.Aktivitas == "jarang olahraga" {
+	} else if aktivitas == "jarang olahraga" {
 		kalori *= 1.375
-	} else if param.Aktivitas == "sering olahraga" {
+	} else if aktivitas == "sering olahraga" {
 		kalori *= 1.55
-	} else if param.Aktivitas == "sangat sering olahraga" {
+	} else if aktivitas == "sangat sering olahraga" {
 		kalori *= 1.725
 	}
 
@@ -91,6 +56,16 @@ func (u *UserService) Create(param model.Register) (entity.User, error) {
 	karbohidrat := (0.6 * kalori) / 4
 	lemak := (0.15 * kalori) / 9
 
+	return kalori, protein, karbohidrat, lemak
+}
+
+func (u *UserService) Create(param model.Register) (entity.User, error) {
+	hashPassword, err := u.bcrypt.GenerateFromPassword(param.Password)
+	if err != nil {
+		return entity.User{}, err
+	}
+
+	kalori, protein, karbohidrat, lemak := hitungNutrisi(param.Aktivitas, param.Gender, param.Umur, param.BeratBadan, param.TinggiBadan)
 	nuser := entity.User{
 		ID:          uuid.New(),
 		UserName:    param.UserName,

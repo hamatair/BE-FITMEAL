@@ -37,6 +37,31 @@ func (u *UserRepository) FindAll() ([]entity.User, error) {
 	return user, err
 }
 
+func hitungNutrisi(aktivitas string, gender string, umur uint, BB uint, TB uint) (float32, float32, float32, float32) {
+	var kalori float32
+	if gender == "male" {
+		kalori = 66 + (13.7*float32(BB) + (5 * float32(TB)) - (6.8 * float32(umur)))
+	} else if gender == "female" {
+		kalori = 655 + (9.6*float32(BB) + (1.8 * float32(TB)) - (4.7 * float32(umur)))
+	}
+
+	if aktivitas == "sangat jarang olahraga" {
+		kalori *= 1.2
+	} else if aktivitas == "jarang olahraga" {
+		kalori *= 1.375
+	} else if aktivitas == "sering olahraga" {
+		kalori *= 1.55
+	} else if aktivitas == "sangat sering olahraga" {
+		kalori *= 1.725
+	}
+
+	protein := (0.15 * kalori) / 4
+	karbohidrat := (0.6 * kalori) / 4
+	lemak := (0.15 * kalori) / 9
+
+	return kalori, protein, karbohidrat, lemak
+}
+
 func (u *UserRepository) UserEditProfile(user model.EditProfile, id string) (entity.User, error) {
 	var data entity.User
 	err := u.db.Where("id = ?", id).First(&data).Error
@@ -49,6 +74,13 @@ func (u *UserRepository) UserEditProfile(user model.EditProfile, id string) (ent
 	data.Alamat = user.Alamat
 	data.BeratBadan = user.BeratBadan
 	data.TinggiBadan = user.TinggiBadan
+
+	kalori, protein, karbohidrat, lemak := hitungNutrisi(data.Aktivitas, data.Gender, data.Umur, data.BeratBadan, data.TinggiBadan)
+
+	data.Kalori = kalori
+	data.Protein = protein
+	data.Karbohidrat = karbohidrat
+	data.Lemak = lemak
 
 	err = u.db.Where("id = ?", id).Updates(&data).Error
 	if err != nil {
