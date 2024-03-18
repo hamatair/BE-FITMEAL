@@ -41,8 +41,8 @@ func (h *Handler) EndPoint() {
 	v1.POST("/meal", h.NewDataMeal)
 	v1.GET("/meal/get", h.GetAllDataMeal)
 	v1.POST("/user/register", h.UserRegisterAndPersonalization)
-	v1.PATCH("/user/edit-profile/:id", h.UserEditProfile)
-	v1.PATCH("/user/edit-profile/change-password/:id", h.changePasswordUser)
+	v1.PATCH("/user/edit-profile/:id",h.Middleware.AuthenticateUser, h.UserEditProfile)
+	v1.PATCH("/user/edit-profile/change-password/:id",h.Middleware.AuthenticateUser, h.changePasswordUser)
 	v1.POST("user/login", h.Login)
 	v1.POST("user/login-user", h.Middleware.AuthenticateUser, h.getLoginUser)
 
