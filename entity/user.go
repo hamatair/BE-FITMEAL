@@ -17,6 +17,10 @@ type User struct {
 	Alamat      string    `json:"alamat" gorm:"type:varchar(255);not null;" binding:"required"`
 	BeratBadan  uint      `json:"beratBadan" binding:"required,number"`
 	TinggiBadan uint      `json:"tinggiBadan" binding:"required,number"`
+	Kalori      float32   `json:"kalori"`
+	Protein     float32   `json:"protein"`
+	Karbohidrat float32   `json:"karbohidrat"`
+	Lemak       float32   `json:"lemak"`
 	CreatedAt   time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt   time.Time `json:"updatedAt" gorm:"autoUpdateTime"`
 }
