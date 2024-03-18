@@ -41,7 +41,7 @@ func (u *UserRepository) UserEditProfile(user model.EditProfile, id string) (ent
 	var data entity.User
 	err := u.db.Where("id = ?", id).First(&data).Error
 	if err != nil {
-		fmt.Println("di First ada", err)
+		return data, err
 	}
 
 	data.UserName = user.UserName
@@ -52,7 +52,7 @@ func (u *UserRepository) UserEditProfile(user model.EditProfile, id string) (ent
 
 	err = u.db.Where("id = ?", id).Updates(&data).Error
 	if err != nil {
-		fmt.Println("pada save ada", err)
+		return data, err
 	}
 
 	return data, err
