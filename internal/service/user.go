@@ -7,6 +7,9 @@ import (
 	"intern-bcc/model"
 	"intern-bcc/pkg/bcrypt"
 	"intern-bcc/pkg/jwt"
+	"math/rand"
+	"net/smtp"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -18,6 +21,9 @@ type UserServiceInterface interface {
 	Login(param model.Login) (model.LoginResponse, error)
 	GetUser(param model.UserParam) (entity.User, error)
 	UserChangePassword(param model.ChangePassword, id string) (entity.User, error)
+	CreateCodeVerification(param model.ForgotPassword) error
+	CheckCode(param model.ForgotPassword) error
+	ChangePasswordBeforeLogin(param model.ChangePasswordBeforeLogin) error
 }
 
 type UserService struct {
@@ -98,7 +104,7 @@ func (u *UserService) FindAll() ([]entity.User, error) {
 func (u *UserService) UserEditProfile(nuser model.EditProfile, id string) (entity.User, error) {
 	UserPersonalization, err := u.userRepository.UserEditProfile(nuser, id)
 	if err != nil {
-		fmt.Println("service", err)
+		return UserPersonalization, err
 	}
 
 	return UserPersonalization, err
@@ -125,7 +131,6 @@ func (u *UserService) Login(param model.Login) (model.LoginResponse, error) {
 	}
 
 	result.Token = token
-	result.ID = nuser.ID
 
 	return result, nil
 }
@@ -148,6 +153,8 @@ func (u *UserService) UserChangePassword(param model.ChangePassword, id string) 
 		return cekUser, err
 	}
 
+	fmt.Println(param.NewPassword)
+	fmt.Println(param.ConfirmPassword)
 	newpassword, _ := u.bcrypt.GenerateFromPassword(param.NewPassword)
 	err = u.bcrypt.CompareAndHashPassword(newpassword, param.ConfirmPassword)
 	if err != nil {
@@ -157,8 +164,89 @@ func (u *UserService) UserChangePassword(param model.ChangePassword, id string) 
 	param.NewPassword = newpassword
 	nuser, err := u.userRepository.UserChangePassword(param, id)
 	if err != nil {
-		fmt.Println("service", err)
+		return nuser, err
 	}
 
 	return nuser, err
+}
+
+func (u *UserService) CreateCodeVerification(param model.ForgotPassword) error {
+	randomNumber := rand.Intn(8999) + 1000
+
+	param.Kode = randomNumber
+	auth := smtp.PlainAuth(
+		"",
+		"gantengsekalibagas123@gmail.com",
+		"mpta kssz otvb zhsd",
+		"smtp.gmail.com",
+	)
+
+	msg := fmt.Sprintf("Subject: this is message %d", param.Kode)
+
+	err := smtp.SendMail(
+		"smtp.gmail.com:587",
+		auth,
+		"gantengsekalibagas123@gmail.com",
+		[]string{"akabeaer212@gmail.com"},
+		[]byte(msg),
+	)
+
+	if err != nil {
+		return err
+	}
+
+	expiredTime := time.Now().Add(time.Hour)
+	param.ExpiredTime = expiredTime
+
+	err = u.userRepository.CreateCodeVerification(param)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *UserService) CheckCode(param model.ForgotPassword) error {
+	dataCode, err := u.userRepository.GetDataCode(param)
+	if err != nil {
+		return err
+	}
+
+	param.ExpiredTime = time.Now()
+	if param.ExpiredTime.After(dataCode.ExpiredTime) {
+		return err
+	}
+
+	if param.Kode != dataCode.Kode {
+		return err
+	}
+
+	return err
+}
+
+func (u *UserService) ChangePasswordBeforeLogin(param model.ChangePasswordBeforeLogin) error {
+	dataUser, err := u.userRepository.GetUser(model.UserParam{
+		Email: param.Email,
+	})
+	if err != nil {
+		return err
+	}
+	newPassword, err := u.bcrypt.GenerateFromPassword(param.NewPassword)
+	if err != nil {
+		return err
+	}
+
+	err = u.bcrypt.CompareAndHashPassword(newPassword, param.ConfirmPassword)
+	if err != nil {
+		return err
+	}
+
+	dataUser.Password = newPassword
+
+	err = u.userRepository.ChangePasswordBeforeLogin(dataUser)
+	if err != nil {
+		return nil
+	}
+
+	return err
 }

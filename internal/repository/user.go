@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"intern-bcc/entity"
 	"intern-bcc/model"
 
@@ -14,6 +13,9 @@ type UserRepositoryInterface interface {
 	UserEditProfile(user model.EditProfile, id string) (entity.User, error)
 	GetUser(param model.UserParam) (entity.User, error)
 	UserChangePassword(param model.ChangePassword, id string) (entity.User, error)
+	CreateCodeVerification(param model.ForgotPassword) error
+	GetDataCode(param model.ForgotPassword) (entity.PasswordValidation, error)
+	ChangePasswordBeforeLogin(param entity.User) error
 }
 
 type UserRepository struct {
@@ -104,16 +106,58 @@ func (u *UserRepository) UserChangePassword(param model.ChangePassword, id strin
 	var data entity.User
 	err := u.db.Where("id = ?", id).First(&data).Error
 	if err != nil {
-		fmt.Println("di pencarian ada", err)
+		return data, err
 	}
 
 	data.Password = param.NewPassword
 
 	err = u.db.Where("id = ?", id).Updates(&data).Error
 	if err != nil {
-		fmt.Println("pada save ada", err)
+		return data, err
 	}
 
 	return data, err
 
+}
+
+func (u *UserRepository) CreateCodeVerification(param model.ForgotPassword) error {
+	code := entity.PasswordValidation{
+		Email:       param.Email,
+		Kode:        int(param.Kode),
+		ExpiredTime: param.ExpiredTime,
+	}
+
+	err := u.db.Create(&code).Error
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+func (u *UserRepository) GetDataCode(param model.ForgotPassword) (entity.PasswordValidation, error) {
+	var dataCode entity.PasswordValidation
+	err := u.db.Where("kode = ?", param.Kode).First(&dataCode).Error
+	if err != nil {
+		return dataCode, err
+	}
+
+	return dataCode, err
+}
+
+func (u *UserRepository) ChangePasswordBeforeLogin(param entity.User) error {
+	var data entity.User
+	err := u.db.Where("id = ?", param.ID).First(&data).Error
+	if err != nil {
+		return err
+	}
+
+	data.Password = param.Password
+
+	err = u.db.Where("id = ?", data.ID).Updates(&data).Error
+	if err != nil {
+		return err
+	}
+
+	return err
 }

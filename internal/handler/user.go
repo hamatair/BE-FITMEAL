@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 func (u *Handler) GetAllDataUser(c *gin.Context) {
@@ -23,18 +22,13 @@ func (u *Handler) GetAllDataUser(c *gin.Context) {
 }
 
 func (u *Handler) GetUserById(c *gin.Context) {
-	param := c.Param("id")
-
-	uuid, _ := uuid.Parse(param)
-
-	findData, err := u.Service.UserService.GetUser(model.UserParam{
-		ID: uuid,
-	})
-	if err != nil {
-		response.Error(c, http.StatusBadRequest, "failed to get user data", err)
+	user, ok := c.Get("user")
+	if !ok {
+		response.Error(c, http.StatusInternalServerError, "failed get login user", errors.New(""))
+		return
 	}
 
-	response.Success(c, http.StatusOK, "success to get user data", findData)
+	response.Success(c, http.StatusOK, "success to get user data", user.(entity.User))
 }
 
 func (h *Handler) UserRegisterAndPersonalization(c *gin.Context) {
@@ -56,7 +50,10 @@ func (h *Handler) UserRegisterAndPersonalization(c *gin.Context) {
 }
 
 func (h *Handler) UserEditProfile(c *gin.Context) {
-	id := c.Param("id")
+	dataUser, ok := c.Get("user")
+	if !ok {
+		response.Error(c, http.StatusNotFound, "failed to get data user", errors.New(""))
+	}
 
 	param := model.EditProfile{}
 
@@ -66,7 +63,7 @@ func (h *Handler) UserEditProfile(c *gin.Context) {
 		c.Next()
 	}
 
-	user, err := h.Service.UserService.UserEditProfile(param, id)
+	user, err := h.Service.UserService.UserEditProfile(param, dataUser.(entity.User).ID.String())
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "failed to personalize data user", err)
 		return
@@ -105,7 +102,11 @@ func (h *Handler) getLoginUser(c *gin.Context) {
 }
 
 func (h *Handler) changePasswordUser(c *gin.Context) {
-	id := c.Param("id")
+	dataUser, ok := c.Get("user")
+	if !ok {
+		response.Error(c, http.StatusInternalServerError, "failed get login user", errors.New(""))
+		return
+	}
 
 	param := model.ChangePassword{}
 
@@ -115,11 +116,59 @@ func (h *Handler) changePasswordUser(c *gin.Context) {
 		return
 	}
 
-	user, err := h.Service.UserService.UserChangePassword(param, id)
+	user, err := h.Service.UserService.UserChangePassword(param, string(dataUser.(entity.User).ID.String()))
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "failed to change password", err)
 		return
 	}
 
 	response.Success(c, http.StatusAccepted, "success to change password", user)
+}
+
+func (h *Handler) CreateCodeVerification(c *gin.Context) {
+	newCode := model.ForgotPassword{}
+
+	err := c.ShouldBindJSON(&newCode)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Failed to bind input", err)
+		c.Next()
+	}
+	err = h.Service.UserService.CreateCodeVerification(newCode)
+
+	response.Success(c, http.StatusOK, "success to send verification code", err)
+}
+
+func (h *Handler) ForgotPasswordUser(c *gin.Context) {
+	var checkCode model.ForgotPassword
+
+	err := c.ShouldBindJSON(&checkCode)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Failed to bind input", err)
+	}
+
+	err = h.Service.UserService.CheckCode(checkCode)
+	if err != nil {
+		response.Error(c, http.StatusNotFound, "failed to validating code", err)
+	}
+
+	response.Success(c, http.StatusOK, "success to validating code", checkCode.Email)
+}
+
+func (h *Handler) ChangePasswordBeforeLogin(c *gin.Context) {
+	var getData model.ChangePasswordBeforeLogin
+
+	err := c.ShouldBindJSON(&getData)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "failed to bind input", err)
+		return
+	}
+
+	err = h.Service.UserService.ChangePasswordBeforeLogin(getData)
+	if err != nil {
+		response.Error(c, http.StatusNotFound, "failed to get data", err)
+		return
+	}
+
+	response.Success(c, http.StatusCreated, "success to change password", err)
+
 }

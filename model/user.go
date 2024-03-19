@@ -1,6 +1,10 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Register struct {
 	ID          uuid.UUID `json:"-"`
@@ -29,6 +33,12 @@ type ChangePassword struct {
 	ConfirmPassword string `json:"confirmPassword" binding:"required"`
 }
 
+type ForgotPassword struct {
+	Email       string `json:"email" binding:"required,email"`
+	Kode        int    `json:"kode"`
+	ExpiredTime time.Time
+}
+
 type Login struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required"`
@@ -43,5 +53,10 @@ type UserParam struct {
 
 type LoginResponse struct {
 	Token string    `json:"token"`
-	ID    uuid.UUID `json:"id"`
+}
+
+type ChangePasswordBeforeLogin struct {
+	Email           string `json:"email" binding:"required,email"`
+	NewPassword     string `json:"newPassword" binding:"required"`
+	ConfirmPassword string `json:"confirmPassword" binding:"required"`
 }
