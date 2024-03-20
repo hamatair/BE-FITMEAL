@@ -10,9 +10,9 @@ import (
 
 type MealServiceInterface interface {
 	FindAll() ([]entity.Meal, error)
-	FindByName(name string) (entity.Meal, error)
+	FindAllByName(name string) ([]entity.Meal, error)
 	CreateNewDataMeal(user model.NewMeal) (entity.Meal, error)
-	FindAllByJenis(name string) ([]entity.Meal, error)
+	FindAllByJenis(jenis string) ([]entity.Meal, error)
 }
 
 type MealService struct {
@@ -47,8 +47,8 @@ func (m *MealService) FindAll() ([]entity.Meal, error) {
 	return meal, err
 }
 
-func (m *MealService) FindByName(name string) (entity.Meal, error) {
-	meal, err := m.mealRepository.FindByName(name)
+func (m *MealService) FindAllByName(name string) ([]entity.Meal, error) {
+	meal, err := m.mealRepository.FindAllByName(name)
 
 	return meal, err
 }

@@ -57,7 +57,8 @@ func (h *Handler) EndPoint() {
 
 	v1.POST("/meal", h.NewDataMeal)
 	v1.GET("/meal/get", h.GetAllDataMeal)
-	v1.GET("/meal/jenis/:jenis", h.GetAllDataMealByJenis)
+	v1.GET("/meal/jenis/get/:jenis", h.GetAllDataMealByJenis)
+	v1.GET("/meal/get/:name", h.GetAllDataMealByName)
 
 	port := os.Getenv("PORT")
 	if port == "" {

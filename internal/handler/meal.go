@@ -45,3 +45,16 @@ func (u *Handler) GetAllDataMealByJenis(c *gin.Context) {
 
 	response.Success(c, http.StatusOK, "success to get data", findData)
 }
+
+func (u *Handler) GetAllDataMealByName(c *gin.Context) {
+	var findData []entity.Meal
+
+	jenis := c.Param("name")
+
+	findData, err := u.Service.MealService.FindAllByName(jenis)
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "fail to get data", err)
+	}
+
+	response.Success(c, http.StatusOK, "success to get data", findData)
+}
