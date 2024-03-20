@@ -32,3 +32,16 @@ func (u *Handler) NewDataMeal(c *gin.Context) {
 
 	response.Success(c, http.StatusAccepted, "success to make a new meal data", newMeal)
 }
+
+func (u *Handler) GetAllDataMealByJenis(c *gin.Context) {
+	var findData []entity.Meal
+
+	jenis := c.Param("jenis")
+
+	findData, err := u.Service.MealService.FindAllByJenis(jenis)
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "fail to get data", err)
+	}
+
+	response.Success(c, http.StatusOK, "success to get data", findData)
+}

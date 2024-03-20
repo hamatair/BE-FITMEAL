@@ -149,6 +149,7 @@ func (h *Handler) ForgotPasswordUser(c *gin.Context) {
 	err = h.Service.UserService.CheckCode(checkCode)
 	if err != nil {
 		response.Error(c, http.StatusNotFound, "failed to validating code", err)
+		return
 	}
 
 	response.Success(c, http.StatusOK, "success to validating code", checkCode.Email)
@@ -170,5 +171,40 @@ func (h *Handler) ChangePasswordBeforeLogin(c *gin.Context) {
 	}
 
 	response.Success(c, http.StatusCreated, "success to change password", err)
+}
 
+func (h *Handler) DailyNutrition(c *gin.Context) {
+	user, ok := c.Get("user")
+	if !ok {
+		response.Error(c, http.StatusInternalServerError, "failed get data user", errors.New(""))
+		return
+	}
+
+	data, err := h.Service.UserService.GetDailyNutrition(user.(entity.User).ID)
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "failed to get data daily nutrition", err)
+		return
+	}
+
+	response.Success(c, http.StatusOK, "success to get data daily nutrition", data)
+}
+
+func (h *Handler) TambahNutrisi(c *gin.Context) {
+	user, ok := c.Get("user")
+	if !ok {
+		response.Error(c, http.StatusNotFound, "failed to get data user", errors.New(""))
+	}
+	var tambah model.TambahNutrisi
+	err := c.ShouldBindJSON(&tambah)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "failed to bind input", err)
+		return
+	}
+
+	err = h.Service.UserService.TambahNutrisi(user.(entity.User).ID, tambah)
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "failed to tambah nutrisi", err)
+	}
+
+	response.Success(c, http.StatusOK, "success to tambah nutrisi", nil)
 }
