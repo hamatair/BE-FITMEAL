@@ -52,11 +52,18 @@ type UserParam struct {
 }
 
 type LoginResponse struct {
-	Token string    `json:"token"`
+	Token string `json:"token"`
 }
 
 type ChangePasswordBeforeLogin struct {
 	Email           string `json:"email" binding:"required,email"`
 	NewPassword     string `json:"newPassword" binding:"required"`
 	ConfirmPassword string `json:"confirmPassword" binding:"required"`
+}
+
+type TambahNutrisi struct {
+	Kalori      float32 `json:"kalori"`
+	Protein     float32 `json:"protein"`
+	Karbohidrat float32 `json:"karbohidrat"`
+	Lemak       float32 `json:"lemak"`
 }

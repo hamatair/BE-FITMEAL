@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+
 	config.LoadEnv()
 
 	jwtAuth := jwt.Init()

@@ -12,6 +12,7 @@ type MealServiceInterface interface {
 	FindAll() ([]entity.Meal, error)
 	FindByName(name string) (entity.Meal, error)
 	CreateNewDataMeal(user model.NewMeal) (entity.Meal, error)
+	FindAllByJenis(name string) ([]entity.Meal, error)
 }
 
 type MealService struct {
@@ -27,6 +28,7 @@ func (m *MealService) CreateNewDataMeal(meal model.NewMeal) (entity.Meal, error)
 	nmeal := entity.Meal{
 		ID:          meal.ID,
 		Name:        meal.Name,
+		Jenis:       meal.Jenis,
 		Kalori:      meal.Kalori,
 		Protein:     meal.Protein,
 		Karbohidrat: meal.Karbohidrat,
@@ -47,6 +49,12 @@ func (m *MealService) FindAll() ([]entity.Meal, error) {
 
 func (m *MealService) FindByName(name string) (entity.Meal, error) {
 	meal, err := m.mealRepository.FindByName(name)
+
+	return meal, err
+}
+
+func (m *MealService) FindAllByJenis(jenis string) ([]entity.Meal, error) {
+	meal, err := m.mealRepository.FindAllByJenis(jenis)
 
 	return meal, err
 }

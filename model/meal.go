@@ -4,9 +4,16 @@ import "github.com/google/uuid"
 
 type NewMeal struct {
 	ID          uuid.UUID `json:"-"`
-	Name        string    `json:"name" binding:"required"`
-	Kalori      uint      `json:"kalori" binding:"required"`
-	Protein     uint      `json:"protein" binding:"required"`
-	Karbohidrat uint      `json:"karbohidrat" binding:"required"`
-	Lemak       uint      `json:"lemak" binding:"required"`
+	Name        string    `json:"name"`
+	Jenis       string    `json:"jenis"`
+	Kalori      uint      `json:"kalori"`
+	Protein     uint      `json:"protein"`
+	Karbohidrat uint      `json:"karbohidrat"`
+	Lemak       uint      `json:"lemak"`
+}
+
+type cariMeal struct {
+	ID    uuid.UUID `json:"-"`
+	Name  string    `json:"-"`
+	Jenis string    `json:"-"`
 }

@@ -9,6 +9,7 @@ import (
 type Meal struct {
 	ID          uuid.UUID `json:"id" gorm:"primary_key;"`
 	Name        string    `json:"name" binding:"required"`
+	Jenis       string    `json:"jenis" binding:"required"`
 	Kalori      uint      `json:"kalori" binding:"required"`
 	Protein     uint      `json:"protein" binding:"required"`
 	Karbohidrat uint      `json:"karbohidrat" binding:"required"`

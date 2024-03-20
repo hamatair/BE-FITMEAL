@@ -10,6 +10,7 @@ type MealRepositoryInterface interface {
 	FindAll() ([]entity.Meal, error)
 	FindByName(name string) (entity.Meal, error)
 	CreateNewDataMeal(user entity.Meal) (entity.Meal, error)
+	FindAllByJenis(jenis string) ([]entity.Meal, error)
 }
 
 type MealRepository struct {
@@ -38,6 +39,13 @@ func (m *MealRepository) FindAll() ([]entity.Meal, error) {
 func (m *MealRepository) FindByName(name string) (entity.Meal, error) {
 	var meal entity.Meal
 	err := m.db.Where("name = ?", name).First(&meal).Error
+
+	return meal, err
+}
+
+func (m *MealRepository) FindAllByJenis(jenis string) ([]entity.Meal, error) {
+	var meal []entity.Meal
+	err := m.db.Where("jenis = ?", jenis).Find(&meal).Error
 
 	return meal, err
 }
