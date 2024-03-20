@@ -4,18 +4,22 @@ import (
 	"intern-bcc/entity"
 	"intern-bcc/model"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type UserRepositoryInterface interface {
 	FindAll() ([]entity.User, error)
-	Create(user entity.User) (entity.User, error)
+	Create(user entity.User, newDaily entity.DailyNutritionUser) (entity.User, error)
 	UserEditProfile(user model.EditProfile, id string) (entity.User, error)
 	GetUser(param model.UserParam) (entity.User, error)
 	UserChangePassword(param model.ChangePassword, id string) (entity.User, error)
 	CreateCodeVerification(param model.ForgotPassword) error
 	GetDataCode(param model.ForgotPassword) (entity.PasswordValidation, error)
 	ChangePasswordBeforeLogin(param entity.User) error
+	GetDailyNutrition(id uuid.UUID) (entity.DailyNutritionUser, error)
+	TambahNutrisi(id uuid.UUID, param model.TambahNutrisi) error
+	ResetDataDailyNutrition() error
 }
 
 type UserRepository struct {
@@ -26,8 +30,12 @@ func NewUserRepository(db *gorm.DB) UserRepositoryInterface {
 	return &UserRepository{db: db}
 }
 
-func (u *UserRepository) Create(user entity.User) (entity.User, error) {
+func (u *UserRepository) Create(user entity.User, newDaily entity.DailyNutritionUser) (entity.User, error) {
 	err := u.db.Create(&user).Error
+	if err != nil {
+		return user, err
+	}
+	err = u.db.Create(&newDaily).Error
 
 	return user, err
 }
@@ -160,4 +168,50 @@ func (u *UserRepository) ChangePasswordBeforeLogin(param entity.User) error {
 	}
 
 	return err
+}
+
+func (u *UserRepository) GetDailyNutrition(id uuid.UUID) (entity.DailyNutritionUser, error) {
+	var data entity.DailyNutritionUser
+	err := u.db.Where("id = ?", id).First(&data).Error
+	if err != nil {
+		return data, err
+	}
+
+	return data, err
+}
+
+func (u *UserRepository) TambahNutrisi(id uuid.UUID, param model.TambahNutrisi) error {
+	var tambah entity.DailyNutritionUser
+	err := u.db.Where("id = ?", id).First(&tambah).Error
+	if err != nil {
+		return err
+	}
+
+	tambah.Kalori += param.Kalori
+	tambah.Protein += param.Protein
+	tambah.Karbohidrat += param.Karbohidrat
+	tambah.Lemak += param.Lemak
+
+	err = u.db.Where("id = ?", id).Updates(tambah).Error
+
+	return err
+}
+
+func (u *UserRepository) ResetDataDailyNutrition() error {
+	var Data []entity.DailyNutritionUser
+	err := u.db.Find(&Data).Error
+	if err != nil {
+		return err
+	}
+
+	for i := range Data {
+		Data[i].Kalori = 0
+		Data[i].Protein = 0
+		Data[i].Karbohidrat = 0
+		Data[i].Lemak = 0
+		err = u.db.Debug().Where("id = ?", Data[i].ID).Save(Data[i]).Error
+	}
+
+	return err
+
 }

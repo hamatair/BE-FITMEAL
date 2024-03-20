@@ -24,6 +24,9 @@ type UserServiceInterface interface {
 	CreateCodeVerification(param model.ForgotPassword) error
 	CheckCode(param model.ForgotPassword) error
 	ChangePasswordBeforeLogin(param model.ChangePasswordBeforeLogin) error
+	GetDailyNutrition(id uuid.UUID) (entity.DailyNutritionUser, error)
+	TambahNutrisi(id uuid.UUID, param model.TambahNutrisi) error
+	ResetDataDailyNutrition() error
 }
 
 type UserService struct {
@@ -89,7 +92,12 @@ func (u *UserService) Create(param model.Register) (entity.User, error) {
 		Lemak:       lemak,
 	}
 
-	newUser, err := u.userRepository.Create(nuser)
+	newDaily := entity.DailyNutritionUser{
+		ID:    nuser.ID,
+		Email: nuser.Email,
+	}
+
+	newUser, err := u.userRepository.Create(nuser, newDaily)
 
 	return newUser, err
 
@@ -249,4 +257,17 @@ func (u *UserService) ChangePasswordBeforeLogin(param model.ChangePasswordBefore
 	}
 
 	return err
+}
+
+func (u *UserService) GetDailyNutrition(id uuid.UUID) (entity.DailyNutritionUser, error) {
+	return u.userRepository.GetDailyNutrition(id)
+
+}
+
+func (u *UserService) TambahNutrisi(id uuid.UUID, param model.TambahNutrisi) error {
+	return u.userRepository.TambahNutrisi(id, param)
+}
+
+func (u *UserService) ResetDataDailyNutrition() error{
+	return u.userRepository.ResetDataDailyNutrition()
 }
