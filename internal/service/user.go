@@ -176,18 +176,18 @@ func (u *UserService) CreateCodeVerification(param model.ForgotPassword) error {
 	param.Kode = randomNumber
 	auth := smtp.PlainAuth(
 		"",
-		"gantengsekalibagas123@gmail.com",
-		"mpta kssz otvb zhsd",
+		"fittmeall@gmail.com",
+		"rcln jshz zavk rmwm",
 		"smtp.gmail.com",
 	)
 
-	msg := fmt.Sprintf("Subject: this is message %d", param.Kode)
+	msg := fmt.Sprintf("Subject: FitMeal Code Verification\nThis is your code verification\n%d\nThe code will be expired in 1 hour.", param.Kode)
 
 	err := smtp.SendMail(
 		"smtp.gmail.com:587",
 		auth,
-		"gantengsekalibagas123@gmail.com",
-		[]string{"akabeaer212@gmail.com"},
+		"fittmeall@gmail.com",
+		[]string{param.Email},
 		[]byte(msg),
 	)
 
