@@ -7,10 +7,13 @@ import (
 	"intern-bcc/model"
 	"intern-bcc/pkg/bcrypt"
 	"intern-bcc/pkg/jwt"
+	"intern-bcc/pkg/supabase"
 	"math/rand"
 	"net/smtp"
+	"os"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
@@ -27,19 +30,22 @@ type UserServiceInterface interface {
 	GetDailyNutrition(id uuid.UUID) (entity.DailyNutritionUser, error)
 	TambahNutrisi(id uuid.UUID, param model.TambahNutrisi) error
 	ResetDataDailyNutrition() error
+	UploadPhoto(c *gin.Context, param model.UserUploadPhoto) error
 }
 
 type UserService struct {
 	userRepository repository.UserRepositoryInterface
 	bcrypt         bcrypt.Interface
 	jwtAuth        jwt.Interface
+	supabase       supabase.Interface
 }
 
-func NewUserService(repository repository.UserRepositoryInterface, bcrypt bcrypt.Interface, jwtAuth jwt.Interface) UserServiceInterface {
+func NewUserService(repository repository.UserRepositoryInterface, bcrypt bcrypt.Interface, jwtAuth jwt.Interface, supabase supabase.Interface) UserServiceInterface {
 	return &UserService{
 		userRepository: repository,
 		bcrypt:         bcrypt,
 		jwtAuth:        jwtAuth,
+		supabase:       supabase,
 	}
 }
 
@@ -184,17 +190,17 @@ func (u *UserService) CreateCodeVerification(param model.ForgotPassword) error {
 	param.Kode = randomNumber
 	auth := smtp.PlainAuth(
 		"",
-		"fittmeall@gmail.com",
-		"rcln jshz zavk rmwm",
-		"smtp.gmail.com",
+		os.Getenv("HOST_EMAIL"),
+		os.Getenv("APP_PASSWORD"),
+		os.Getenv("ADDR"),
 	)
 
-	msg := fmt.Sprintf("Subject: FitMeal Code Verification\nThis is your code verification\n%d\nThe code will be expired in 1 hour.", param.Kode)
+	msg := fmt.Sprintf("Subject: FitMeal Code Verification\nThis is your code verification\n%d\nThe code will be expired in 1 Minute.", param.Kode)
 
 	err := smtp.SendMail(
-		"smtp.gmail.com:587",
+		os.Getenv("ADDRESS"),
 		auth,
-		"fittmeall@gmail.com",
+		os.Getenv("HOST_EMAIL"),
 		[]string{param.Email},
 		[]byte(msg),
 	)
@@ -203,7 +209,7 @@ func (u *UserService) CreateCodeVerification(param model.ForgotPassword) error {
 		return err
 	}
 
-	expiredTime := time.Now().Add(time.Hour)
+	expiredTime := time.Now().Add(time.Minute)
 	param.ExpiredTime = expiredTime
 
 	err = u.userRepository.CreateCodeVerification(param)
@@ -268,6 +274,37 @@ func (u *UserService) TambahNutrisi(id uuid.UUID, param model.TambahNutrisi) err
 	return u.userRepository.TambahNutrisi(id, param)
 }
 
-func (u *UserService) ResetDataDailyNutrition() error{
+func (u *UserService) ResetDataDailyNutrition() error {
 	return u.userRepository.ResetDataDailyNutrition()
+}
+
+func (u *UserService) UploadPhoto(c *gin.Context, param model.UserUploadPhoto) error {
+	user, err := u.jwtAuth.GetLoginUser(c)
+	if err != nil {
+		return err
+	}
+
+	if user.PhotoLink != "" {
+		err = u.supabase.Delete([]string{user.PhotoName})
+		if err != nil {
+			return err
+		}
+	}
+
+	link2, err := u.supabase.Upload(param.Photo)
+	if err != nil {
+		return err
+	}
+
+	err = u.userRepository.UpdateUser(entity.User{
+		PhotoLink: link2,
+		PhotoName: param.Photo.Filename,
+	}, model.UserParam{
+		ID: user.ID,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

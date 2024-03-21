@@ -9,6 +9,7 @@ import (
 	"intern-bcc/pkg/database/mysql"
 	"intern-bcc/pkg/jwt"
 	"intern-bcc/pkg/middleware"
+	"intern-bcc/pkg/supabase"
 )
 
 func main() {
@@ -19,11 +20,13 @@ func main() {
 
 	bCrypt := bcrypt.Init()
 
+	supabase := supabase.Init()
+
 	db := mysql.ConnectDatabase()
 
 	newRepository := repository.NewRepository(db)
 
-	newService := service.NewService(service.InitParam{Repository: newRepository, JwtAuth: jwtAuth, Bcrypt: bCrypt})
+	newService := service.NewService(service.InitParam{Repository: newRepository, JwtAuth: jwtAuth, Bcrypt: bCrypt, Supabase: supabase})
 
 	middleware := middleware.Init(jwtAuth,newService)
 

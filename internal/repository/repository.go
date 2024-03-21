@@ -11,5 +11,6 @@ func NewRepository(db *gorm.DB) *Repository{
 	return &Repository{
 		UserRepository: NewUserRepository(db),
 		MealRepository: NewMealRepository(db),
+		
 	}
 }

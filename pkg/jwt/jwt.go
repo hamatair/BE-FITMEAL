@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"errors"
 	"intern-bcc/entity"
 	"log"
 	"os"
@@ -62,7 +63,12 @@ func (j *jsonWebToken) CreateJWTToken(userID uuid.UUID) (string, error) {
 
 // GetLoginUser implements Interface.
 func (*jsonWebToken) GetLoginUser(c *gin.Context) (entity.User, error) {
-	panic("unimplemented")
+	user, ok := c.Get("user")
+	if !ok {
+		return entity.User{}, errors.New("failed to get user")
+	}
+
+	return user.(entity.User), nil
 }
 
 // ValidateToken implements Interface.

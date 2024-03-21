@@ -208,3 +208,19 @@ func (h *Handler) TambahNutrisi(c *gin.Context) {
 
 	response.Success(c, http.StatusOK, "success to tambah nutrisi", nil)
 }
+
+func (h *Handler) UploadPhoto(c *gin.Context) {
+	photo, err := c.FormFile("photo")
+	if err != nil {
+		response.Success(c, http.StatusBadRequest, "failed to bind input", err)
+		return
+	}
+
+	err = h.Service.UserService.UploadPhoto(c, model.UserUploadPhoto{Photo: photo})
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "failed to upload photo", err)
+		return
+	}
+
+	response.Success(c, http.StatusOK, "success upload photo", nil)
+}

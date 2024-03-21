@@ -20,6 +20,7 @@ type UserRepositoryInterface interface {
 	GetDailyNutrition(id uuid.UUID) (entity.DailyNutritionUser, error)
 	TambahNutrisi(id uuid.UUID, param model.TambahNutrisi) error
 	ResetDataDailyNutrition() error
+	UpdateUser(user entity.User, param model.UserParam) error
 }
 
 type UserRepository struct {
@@ -214,4 +215,13 @@ func (u *UserRepository) ResetDataDailyNutrition() error {
 
 	return err
 
+}
+
+func (u *UserRepository) UpdateUser(user entity.User, param model.UserParam) error {
+	err := u.db.Debug().Model(&entity.User{}).Where(param).Updates(&user).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

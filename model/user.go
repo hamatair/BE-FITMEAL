@@ -1,6 +1,7 @@
 package model
 
 import (
+	"mime/multipart"
 	"time"
 
 	"github.com/google/uuid"
@@ -66,4 +67,8 @@ type TambahNutrisi struct {
 	Protein     float32 `json:"protein"`
 	Karbohidrat float32 `json:"karbohidrat"`
 	Lemak       float32 `json:"lemak"`
+}
+
+type UserUploadPhoto struct{
+	Photo *multipart.FileHeader `form:"photo"`
 }

@@ -52,6 +52,8 @@ func (h *Handler) EndPoint() {
 	v1.POST("/user/forgot-password", h.ForgotPasswordUser)
 	v1.POST("/user/forgot-password/change-password", h.ChangePasswordBeforeLogin)
 
+	v1.POST("/user/upload-photo", h.Middleware.AuthenticateUser, h.UploadPhoto)
+
 	v1.GET("/user/daily-nutrition", h.Middleware.AuthenticateUser, h.DailyNutrition)
 	v1.POST("/user/tambah-nutrisi", h.Middleware.AuthenticateUser, h.TambahNutrisi)
 
