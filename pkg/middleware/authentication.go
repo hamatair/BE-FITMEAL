@@ -10,29 +10,29 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (m *Middleware) AuthenticateUser(ctx *gin.Context) {
-	bearer := ctx.GetHeader("Authorization")
+func (m *Middleware) AuthenticateUser(c *gin.Context) {
+	bearer := c.GetHeader("Authorization")
 	if bearer == "" {
-		response.Error(ctx, http.StatusUnauthorized, "empty token", errors.New(""))
-		ctx.Abort()
+		response.Error(c, http.StatusUnauthorized, "empty token", errors.New(""))
+		c.Abort()
 	}
 
 	token := strings.Split(bearer, " ")[1]
 	userId, err := m.jwtauth.ValidateToken(token)
 	if err != nil {
-		response.Error(ctx, http.StatusUnauthorized, "failed validate token", err)
-		ctx.Abort()
+		response.Error(c, http.StatusUnauthorized, "failed validate token", err)
+		c.Abort()
 	}
 	
 	user, err := m.service.UserService.GetUser(model.UserParam{
 		ID: userId,
 	})
 	if err != nil {
-		response.Error(ctx, http.StatusUnauthorized, "failed get user", err)
-		ctx.Abort()
+		response.Error(c, http.StatusUnauthorized, "failed get user", err)
+		c.Abort()
 	}
 
-	ctx.Set("user", user)
+	c.Set("user", user)
 
-	ctx.Next()
+	c.Next()
 }

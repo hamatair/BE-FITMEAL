@@ -12,4 +12,5 @@ func Migration(db *gorm.DB) {
 	db.AutoMigrate(entity.PasswordValidation{})
 	db.AutoMigrate(entity.DailyNutritionUser{})
 	db.AutoMigrate(entity.TopUp{})
+	db.AutoMigrate(entity.PaketMakan{})
 }

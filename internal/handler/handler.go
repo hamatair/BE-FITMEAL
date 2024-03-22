@@ -41,7 +41,6 @@ func (h *Handler) EndPoint() {
 
 	v1 := h.Router.Group("/v1")
 
-	v1.GET("/user/get", h.GetAllDataUser)
 	v1.GET("/user/get-user-profile", h.Middleware.AuthenticateUser, h.GetUserById)
 	v1.POST("/user/register", h.UserRegisterAndPersonalization)
 	v1.PATCH("/user/edit-profile", h.Middleware.AuthenticateUser, h.UserEditProfile)
@@ -59,6 +58,8 @@ func (h *Handler) EndPoint() {
 
 	v1.GET("/user/daily-nutrition", h.Middleware.AuthenticateUser, h.DailyNutrition)
 	v1.POST("/user/tambah-nutrisi", h.Middleware.AuthenticateUser, h.TambahNutrisi)
+	v1.POST("/user/tambah-paket", h.Middleware.AuthenticateUser, h.Middleware.PremiumAccess, h.PaketMakan)
+	v1.GET("/user/paket/get", h.Middleware.AuthenticateUser, h.Middleware.PremiumAccess, h.GetAllDataPaketByUserId)
 
 	v1.POST("/meal", h.NewDataMeal)
 	v1.GET("/meal/get", h.GetAllDataMeal)

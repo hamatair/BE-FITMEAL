@@ -18,7 +18,6 @@ import (
 )
 
 type UserServiceInterface interface {
-	FindAll() ([]entity.User, error)
 	Create(nuser model.Register) (entity.User, error)
 	UserEditProfile(nuser model.EditProfile, id string) (entity.User, error)
 	Login(param model.Login) (model.LoginResponse, error)
@@ -31,6 +30,8 @@ type UserServiceInterface interface {
 	TambahNutrisi(id uuid.UUID, param model.TambahNutrisi) error
 	ResetDataDailyNutrition() error
 	UploadPhoto(c *gin.Context, param model.UserUploadPhoto) error
+	CreatePaket(paket model.PaketMakan, id uuid.UUID) error
+	FindAllPaketByUserId(id uuid.UUID) ([]entity.PaketMakan, error)
 }
 
 type UserService struct {
@@ -109,11 +110,7 @@ func (u *UserService) Create(param model.Register) (entity.User, error) {
 
 }
 
-func (u *UserService) FindAll() ([]entity.User, error) {
-	nuser, err := u.userRepository.FindAll()
 
-	return nuser, err
-}
 
 func (u *UserService) UserEditProfile(nuser model.EditProfile, id string) (entity.User, error) {
 	UserPersonalization, err := u.userRepository.UserEditProfile(nuser, id)
@@ -307,4 +304,32 @@ func (u *UserService) UploadPhoto(c *gin.Context, param model.UserUploadPhoto) e
 	}
 
 	return nil
+}
+
+func (u *UserService) CreatePaket(paket model.PaketMakan, id uuid.UUID) error {
+	datapaket := entity.PaketMakan{
+		ID:          uuid.New(),
+		UserID:      id,
+		Name:        paket.Name,
+		Kalori:      paket.Kalori,
+		Protein:     paket.Protein,
+		Karbohidrat: paket.Karbohidrat,
+		Lemak:       paket.Lemak,
+	}
+
+	err := u.userRepository.CreatePaket(datapaket)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m UserService) FindAllPaketByUserId(id uuid.UUID) ([]entity.PaketMakan, error) {
+	paket, err := m.userRepository.FindAllPaketByUserId(id)
+	if err != nil {
+		return paket, err
+	}
+
+	return paket, nil
 }

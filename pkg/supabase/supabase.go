@@ -26,9 +26,9 @@ func (s *supabaseStorage) Delete(link []string) error {
 	return nil
 }
 
-// Upload implements Interface3.
+
 func (s *supabaseStorage) Upload(file *multipart.FileHeader) (string, error) {
-	fileBody, err := file.Open() // load your file here
+	fileBody, err := file.Open() 
 	if err != nil {
 		return "", err
 	}

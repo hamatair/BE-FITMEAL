@@ -9,7 +9,6 @@ import (
 )
 
 type UserRepositoryInterface interface {
-	FindAll() ([]entity.User, error)
 	Create(user entity.User, newDaily entity.DailyNutritionUser) (entity.User, error)
 	UserEditProfile(user model.EditProfile, id string) (entity.User, error)
 	GetUser(param model.UserParam) (entity.User, error)
@@ -21,6 +20,8 @@ type UserRepositoryInterface interface {
 	TambahNutrisi(id uuid.UUID, param model.TambahNutrisi) error
 	ResetDataDailyNutrition() error
 	UpdateUser(user entity.User, param model.UserParam) error
+	CreatePaket(paket entity.PaketMakan) error
+	FindAllPaketByUserId(id uuid.UUID) ([]entity.PaketMakan, error)
 }
 
 type UserRepository struct {
@@ -37,15 +38,11 @@ func (u *UserRepository) Create(user entity.User, newDaily entity.DailyNutrition
 		return user, err
 	}
 	err = u.db.Create(&newDaily).Error
+	if err != nil {
+		return user, err
+	}
 
-	return user, err
-}
-
-func (u *UserRepository) FindAll() ([]entity.User, error) {
-	var user []entity.User
-	err := u.db.Find(&user).Error
-
-	return user, err
+	return user, nil
 }
 
 func hitungNutrisi(aktivitas string, gender string, umur uint, BB uint, TB uint) (float32, float32, float32, float32) {
@@ -98,7 +95,7 @@ func (u *UserRepository) UserEditProfile(user model.EditProfile, id string) (ent
 		return data, err
 	}
 
-	return data, err
+	return data, nil
 }
 
 func (u *UserRepository) GetUser(param model.UserParam) (entity.User, error) {
@@ -125,7 +122,7 @@ func (u *UserRepository) UserChangePassword(param model.ChangePassword, id strin
 		return data, err
 	}
 
-	return data, err
+	return data, nil
 
 }
 
@@ -141,7 +138,7 @@ func (u *UserRepository) CreateCodeVerification(param model.ForgotPassword) erro
 		return err
 	}
 
-	return err
+	return nil
 }
 
 func (u *UserRepository) GetDataCode(param model.ForgotPassword) (entity.PasswordValidation, error) {
@@ -151,7 +148,7 @@ func (u *UserRepository) GetDataCode(param model.ForgotPassword) (entity.Passwor
 		return dataCode, err
 	}
 
-	return dataCode, err
+	return dataCode, nil
 }
 
 func (u *UserRepository) ChangePasswordBeforeLogin(param entity.User) error {
@@ -168,7 +165,7 @@ func (u *UserRepository) ChangePasswordBeforeLogin(param entity.User) error {
 		return err
 	}
 
-	return err
+	return nil
 }
 
 func (u *UserRepository) GetDailyNutrition(id uuid.UUID) (entity.DailyNutritionUser, error) {
@@ -178,7 +175,7 @@ func (u *UserRepository) GetDailyNutrition(id uuid.UUID) (entity.DailyNutritionU
 		return data, err
 	}
 
-	return data, err
+	return data, nil
 }
 
 func (u *UserRepository) TambahNutrisi(id uuid.UUID, param model.TambahNutrisi) error {
@@ -194,6 +191,9 @@ func (u *UserRepository) TambahNutrisi(id uuid.UUID, param model.TambahNutrisi) 
 	tambah.Lemak += param.Lemak
 
 	err = u.db.Where("id = ?", id).Updates(tambah).Error
+	if err != nil {
+		return err
+	}
 
 	return err
 }
@@ -210,10 +210,10 @@ func (u *UserRepository) ResetDataDailyNutrition() error {
 		Data[i].Protein = 0
 		Data[i].Karbohidrat = 0
 		Data[i].Lemak = 0
-		err = u.db.Debug().Where("id = ?", Data[i].ID).Save(Data[i]).Error
+		u.db.Debug().Where("id = ?", Data[i].ID).Save(Data[i])
 	}
 
-	return err
+	return nil
 
 }
 
@@ -224,4 +224,20 @@ func (u *UserRepository) UpdateUser(user entity.User, param model.UserParam) err
 	}
 
 	return nil
+}
+
+func (u *UserRepository) CreatePaket(paket entity.PaketMakan) error {
+	err := u.db.Create(paket).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *UserRepository) FindAllPaketByUserId(id uuid.UUID) ([]entity.PaketMakan, error) {
+	var paket []entity.PaketMakan
+	err := m.db.Where("user_id = ?", id).Find(&paket).Error
+
+	return paket, err
 }

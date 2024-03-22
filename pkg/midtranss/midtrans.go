@@ -43,10 +43,7 @@ func NewMidtrans(cnf *Midtrans) MidtransServiceI {
 	}
 }
 
-// GenerateSnapUrl implements MidtransService.
 func (m *MidtransServices) GenerateSnapUrl(t *entity.TopUp) error {
-	// currentTime := time.Now().UTC().Truncate(time.Nanosecond)
-	// formattedTime := currentTime.Format("2006-01-02 15:04:05 -0700")
 	req := &snap.Request{
 		TransactionDetails: midtrans.TransactionDetails{
 			OrderID:  t.ID.String(),
@@ -62,11 +59,6 @@ func (m *MidtransServices) GenerateSnapUrl(t *entity.TopUp) error {
 				Qty:   1,
 			},
 		},
-		// Expiry: &snap.ExpiryDetails{
-		// 	StartTime: formattedTime,
-		// 	Unit:      "HOUR",
-		// 	Duration:  int64(1 * time.Hour),
-		// },
 	}
 
 	snaResp, err := m.client.CreateTransaction(req)
@@ -94,7 +86,6 @@ func (m *MidtransServices) VerifyPayment( data map[string]interface{}) error {
 		return errors.New("invalid payload")
 	}
 
-	// 4. Check transaction to Midtrans with param orderId
 	transactionStatusResp, err := client.CheckTransaction(orderId)
 	if err != nil {
 		return err

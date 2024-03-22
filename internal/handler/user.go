@@ -10,17 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (u *Handler) GetAllDataUser(c *gin.Context) {
-	var findData []entity.User
-
-	findData, err := u.Service.UserService.FindAll()
-	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "failed to get all data user", err)
-	}
-
-	response.Success(c, http.StatusOK, "success to get all data user", findData)
-}
-
 func (u *Handler) GetUserById(c *gin.Context) {
 	user, ok := c.Get("user")
 	if !ok {
@@ -53,6 +42,7 @@ func (h *Handler) UserEditProfile(c *gin.Context) {
 	dataUser, ok := c.Get("user")
 	if !ok {
 		response.Error(c, http.StatusNotFound, "failed to get data user", errors.New(""))
+		return
 	}
 
 	param := model.EditProfile{}
@@ -60,7 +50,7 @@ func (h *Handler) UserEditProfile(c *gin.Context) {
 	err := c.ShouldBindJSON(&param)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Failed to bind input", err)
-		c.Next()
+		return
 	}
 
 	user, err := h.Service.UserService.UserEditProfile(param, dataUser.(entity.User).ID.String())
@@ -131,7 +121,7 @@ func (h *Handler) CreateCodeVerification(c *gin.Context) {
 	err := c.ShouldBindJSON(&newCode)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Failed to bind input", err)
-		c.Next()
+		return
 	}
 	err = h.Service.UserService.CreateCodeVerification(newCode)
 
@@ -144,6 +134,7 @@ func (h *Handler) ForgotPasswordUser(c *gin.Context) {
 	err := c.ShouldBindJSON(&checkCode)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "Failed to bind input", err)
+		return
 	}
 
 	err = h.Service.UserService.CheckCode(checkCode)
@@ -193,6 +184,7 @@ func (h *Handler) TambahNutrisi(c *gin.Context) {
 	user, ok := c.Get("user")
 	if !ok {
 		response.Error(c, http.StatusNotFound, "failed to get data user", errors.New(""))
+		return
 	}
 	var tambah model.TambahNutrisi
 	err := c.ShouldBindJSON(&tambah)
@@ -204,6 +196,7 @@ func (h *Handler) TambahNutrisi(c *gin.Context) {
 	err = h.Service.UserService.TambahNutrisi(user.(entity.User).ID, tambah)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "failed to tambah nutrisi", err)
+		return
 	}
 
 	response.Success(c, http.StatusOK, "success to tambah nutrisi", nil)
@@ -223,4 +216,45 @@ func (h *Handler) UploadPhoto(c *gin.Context) {
 	}
 
 	response.Success(c, http.StatusOK, "success upload photo", nil)
+}
+
+func (h *Handler) PaketMakan(c *gin.Context) {
+	var paket model.PaketMakan
+	err := c.ShouldBindJSON(&paket)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "failed to bind input", err)
+		return
+	}
+
+	user, ok := c.Get("user")
+	if !ok {
+		response.Error(c, http.StatusNotFound, "failed to get data user", errors.New(""))
+		return
+	}
+
+	err = h.Service.UserService.CreatePaket(paket, user.(entity.User).ID)
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "failed to create paket", err)
+		return
+	}
+
+	response.Success(c, http.StatusOK, "success to create paket", nil)
+}
+
+func (h *Handler) GetAllDataPaketByUserId(c *gin.Context) {
+	var findData []entity.PaketMakan
+
+	user, ok := c.Get("user")
+	if !ok {
+		response.Error(c, http.StatusNotFound, "failed to get data user", errors.New(""))
+		return
+	}
+
+	findData, err := h.Service.UserService.FindAllPaketByUserId(user.(entity.User).ID)
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "fail to get data", err)
+		return
+	}
+
+	response.Success(c, http.StatusOK, "success to get data", findData)
 }

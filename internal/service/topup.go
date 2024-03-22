@@ -58,11 +58,6 @@ func (t *TopUpservices) InitializeTopUp(req model.TopUpReq) (model.TopUpRes, err
 
 // ConfirmedTopUp implements TopUpServiceI.
 func (t *TopUpservices) ConfirmedTopUp(id string, data map[string]interface{}) error {
-	err := t.midtransService.VerifyPayment(data)
-	if err != nil {
-		return err
-	}
-
 	topUp, err := t.TopUpRepository.FindById(id)
 	if err != nil {
 		return err
@@ -74,13 +69,22 @@ func (t *TopUpservices) ConfirmedTopUp(id string, data map[string]interface{}) e
 
 	topUp.Status = 1
 
+	err = t.TopUpRepository.Update(&topUp)
+	if err != nil {
+		return err
+	}
+
+	err = t.midtransService.VerifyPayment(data)
+	if err != nil {
+		return err
+	}
+
 	account, err := t.Account.GetUser(model.UserParam{
 		ID: topUp.ID,
 	})
 	if err != nil {
 		return err
 	}
-
 
 	account.Balance += topUp.Amount
 

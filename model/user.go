@@ -72,3 +72,12 @@ type TambahNutrisi struct {
 type UserUploadPhoto struct{
 	Photo *multipart.FileHeader `form:"photo"`
 }
+
+type PaketMakan struct {
+	Name        string    `json:"name"`
+	Jenis       string    `json:"jenis"`
+	Kalori      float32   `json:"kalori"`
+	Protein     float32   `json:"protein"`
+	Karbohidrat float32   `json:"karbohidrat"`
+	Lemak       float32   `json:"lemak"`
+}

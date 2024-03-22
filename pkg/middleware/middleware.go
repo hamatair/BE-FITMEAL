@@ -16,7 +16,8 @@ import (
 
 type Interface interface {
 	TimeoutMiddleware() gin.HandlerFunc
-	AuthenticateUser(ctx *gin.Context)
+	AuthenticateUser(c *gin.Context)
+	PremiumAccess(c *gin.Context)
 }
 
 type Middleware struct {

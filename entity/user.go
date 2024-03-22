@@ -24,6 +24,7 @@ type User struct {
 	PhotoLink   string    `json:"photoLink" gorm:"type:varchar(200);"`
 	PhotoName   string    `json:"photoName"`
 	Balance     uint      `json:"balance"`
+	Role        uint      `json:"role"`
 	CreatedAt   time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt   time.Time `json:"updatedAt" gorm:"autoUpdateTime"`
 }

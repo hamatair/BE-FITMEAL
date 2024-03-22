@@ -15,6 +15,7 @@ func (u *Handler) GetAllDataMeal(c *gin.Context) {
 	findData, err := u.Service.MealService.FindAll()
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "fail to get data", err)
+		return
 	}
 
 	response.Success(c, http.StatusOK, "success to get data", findData)
@@ -28,6 +29,7 @@ func (u *Handler) NewDataMeal(c *gin.Context) {
 	newMeal, err := u.Service.MealService.CreateNewDataMeal(newmeal)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "fail to make a new meal data", err)
+		return
 	}
 
 	response.Success(c, http.StatusAccepted, "success to make a new meal data", newMeal)
@@ -41,6 +43,7 @@ func (u *Handler) GetAllDataMealByJenis(c *gin.Context) {
 	findData, err := u.Service.MealService.FindAllByJenis(jenis)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "fail to get data", err)
+		return
 	}
 
 	response.Success(c, http.StatusOK, "success to get data", findData)
@@ -54,6 +57,7 @@ func (u *Handler) GetAllDataMealByName(c *gin.Context) {
 	findData, err := u.Service.MealService.FindAllByName(jenis)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "fail to get data", err)
+		return
 	}
 
 	response.Success(c, http.StatusOK, "success to get data", findData)
