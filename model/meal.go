@@ -12,8 +12,4 @@ type NewMeal struct {
 	Lemak       float32   `json:"lemak"`
 }
 
-type cariMeal struct {
-	ID    uuid.UUID `json:"-"`
-	Name  string    `json:"-"`
-	Jenis string    `json:"-"`
-}
+
