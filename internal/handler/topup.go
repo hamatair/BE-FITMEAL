@@ -35,15 +35,19 @@ func (h *Handler) TopUp(c *gin.Context) {
 }
 
 func (h *Handler) VerifyPayment(c *gin.Context) {
-	user, ok := c.Get("user")
-	if !ok {
-		response.Error(c, http.StatusNotFound, "failed to get user data", errors.New(""))
-	}
-
 	var notificationPayload map[string]interface{}
 	err := c.ShouldBindJSON(&notificationPayload)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "failed to bind input", err)
+	}
+	// err := json.NewDecoder(c.Request.Response.Body).Decode(&notificationPayload)
+	// if err != nil {
+	// 	response.Error(c, http.StatusBadRequest, "failed to bind input", err)
+	// }
+
+	user, ok := c.Get("user")
+	if !ok {
+		response.Error(c, http.StatusNotFound, "failed to get user data", errors.New(""))
 	}
 
 	err = h.Service.TopUpService.ConfirmedTopUp(user.(entity.User).ID.String(), notificationPayload)
@@ -53,4 +57,4 @@ func (h *Handler) VerifyPayment(c *gin.Context) {
 
 	response.Success(c, http.StatusOK, "success to verify payment", nil)
 
-}	
+}

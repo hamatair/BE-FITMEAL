@@ -1,10 +1,8 @@
 package repository
 
 import (
-	// "database/sql"
 	"intern-bcc/entity"
 
-	// "github.com/doug-martin/goqu"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -35,12 +33,6 @@ func (r *TopUpRepository) FindById(id string) (entity.TopUp, error) {
 
 // Insert implements TopUpRepository.
 func (r *TopUpRepository) Insert(t *entity.TopUp) error {
-	// _, err := r.db.From("topup").Insert(goqu.Record{
-	// 	"userid" : t.UserID,
-	// 	"amount" : t.Amount,
-	// 	"status" : t.Status,
-	// 	"snapUrl": t.SnapUrl,
-	// }).ExecContext(c)
 
 	err := r.db.Create(&t).Error
 
