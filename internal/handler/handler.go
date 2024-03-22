@@ -55,6 +55,7 @@ func (h *Handler) EndPoint() {
 	v1.POST("/user/upload-photo", h.Middleware.AuthenticateUser, h.UploadPhoto)
 
 	v1.POST("/user/top-up", h.Middleware.AuthenticateUser, h.TopUp)
+	v1.POST("/user/top-up/status", h.VerifyPayment)
 
 	v1.GET("/user/daily-nutrition", h.Middleware.AuthenticateUser, h.DailyNutrition)
 	v1.POST("/user/tambah-nutrisi", h.Middleware.AuthenticateUser, h.TambahNutrisi)
